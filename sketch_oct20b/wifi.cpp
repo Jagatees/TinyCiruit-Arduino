@@ -32,5 +32,11 @@ void initWIFI() {
 
 void logicWIFI() {
   SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.");
+
+  int response = WiFi.ping("www.google.com");
+
+  SerialMonitorInterface.print("Ping response time (ms): ");
+  SerialMonitorInterface.println(response);
+  
   delay(60000); // Wait a minute before going back through the main loop
 }
