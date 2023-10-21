@@ -1,5 +1,8 @@
 
 #include <WiFi101.h>
+#include <WiFiClient.h>
+#include <ArduinoJson.h>
+
 
 #if defined(ARDUINO_ARCH_SAMD)
   #define SerialMonitorInterface SerialUSB
