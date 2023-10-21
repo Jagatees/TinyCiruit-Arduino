@@ -37,7 +37,7 @@ void logicWIFI() {
 
   // Make an HTTP GET request to the JSONPlaceholder API to fetch posts
   WiFiClient client;
-  if (client.connect("my-json-server.typicode.com/user/repo/posts/1", 80)) {
+  if (client.connect("my-json-server.typicode.com", 80)) {
     SerialMonitorInterface.println("Connected to JSONPlaceholder API");
 
     // Make the GET request to fetch posts
