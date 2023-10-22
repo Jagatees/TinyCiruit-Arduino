@@ -37,14 +37,38 @@ void logicWIFI() {
 
   // Make an HTTP GET request to the JSONPlaceholder API to fetch posts
   WiFiClient client;
-  if (client.connect("my-json-server.typicode.com", 80)) {
+  if (client.connect("worldtimeapi.org", 80)) {
     SerialMonitorInterface.println("Connected to JSONPlaceholder API");
 
-    // Make the GET request to fetch posts
-    client.println("GET /posts/1 HTTP/1.1");
-    client.println("Host: jsonplaceholder.typicode.com");
+    String URI = "/api/timezone/asia/kolkata";
+    const char * Hostname = "worldtimeapi.org";
+
+
+    // Send HTTP request
+    client.println("GET " + URI + " HTTP/1.0");
+    client.println("Host: " + (String)Hostname);
     client.println("Connection: close");
     client.println();
+
+    // Check HTTP status
+    char status[32] = {0};
+    client.readBytesUntil('\r', status, sizeof(status));
+    if (strcmp(status, "HTTP/1.0 200 OK") != 0) {
+      Serial.print(F("Unexpected response: "));
+      Serial.println(status);
+      client.stop();
+      return;
+    }
+
+    // Skip HTTP headers
+    char endOfHeaders[] = "\r\n\r\n";
+    if (!client.find(endOfHeaders)) {
+      Serial.println(F("Invalid response"));
+      client.stop();
+      return;
+    }
+
+    
 
     // Read and print the response
     while (client.connected()) {
