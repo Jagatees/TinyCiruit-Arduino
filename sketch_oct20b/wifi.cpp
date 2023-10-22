@@ -2,16 +2,28 @@
 #include "wifi.h"
 // jsonplaceholder.typicode.com
 
-void initWIFI() {
-  // char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
-  // char wifiPassword[] = "57hhcumfd8";  // your network password
 
-  char ssid[] = "Jagatees-Phone";  //  your network SSID (name)
-  char wifiPassword[] = "1234567890";  // your network password
+#include "wifi.h"
+// jsonplaceholder.typicode.com
+
+void initWIFI() {
+  // Moden + Router
+  char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
+  char wifiPassword[] = "57hhcumfd8";  // your network password
+
+  // char ssid[] = "Jagatees-Phone";  //  your network SSID (name)
+  // char wifiPassword[] = "1234567890";  // your network password
 
   SerialMonitorInterface.begin(9600);
   WiFi.setPins(8, 2, A3, -1); // VERY IMPORTANT FOR TINYDUINO
   while(!SerialMonitorInterface);
+
+   // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present");
+    // don't continue:
+    while (true);
+  }
 
   // Attempt to connect to Wifi network:
   SerialMonitorInterface.print("Connecting Wifi: ");
@@ -30,6 +42,25 @@ void initWIFI() {
   SerialMonitorInterface.println("IP address: ");
   IPAddress ip = WiFi.localIP();
   SerialMonitorInterface.println(ip);
+
+
+  // Excellent Signal: -30 dBm to -50 dBm
+  // Good Signal: -51 dBm to -70 dBm
+  // Fair Signal: -71 dBm to -90 dBm
+  // Poor Signal: -91 dBm to -100 dBm
+  // No Signal: -100 dBm and below
+  long rssi = WiFi.RSSI();
+  SerialMonitorInterface.print("signal strength (RSSI):");
+  SerialMonitorInterface.println(rssi);
+
+  // 1 = WEP (Wired Equivalent Privacy)
+  // 2 = WPA (WiFi Protected Access) [Jagatees House Wifi]
+  // 3 = WPA3 (WiFi Protected Access 3)
+  // 4 = Open Network (No Encryption)
+  byte encryption = WiFi.encryptionType();
+  SerialMonitorInterface.print("Encryption Type:");
+  SerialMonitorInterface.println(encryption, HEX);
+  SerialMonitorInterface.println();
 
 }
 
@@ -97,7 +128,10 @@ void requestAPI() {
 void logicWIFI() {
   SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.\n");
 
-  requestAPI();
 
-  delay(60000); // Wait a minute before going back through the main loop
+  delay(10000); // Wait a minute before going back through the main loop
 }
+
+
+
+
