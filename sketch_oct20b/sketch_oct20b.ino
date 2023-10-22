@@ -1,4 +1,4 @@
-#include "wifi.h"
+#include "j_wifi.h"
 
 void setup() {
   initWIFI();

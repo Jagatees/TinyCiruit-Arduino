@@ -1,13 +1,15 @@
-#include "wifi.h"
+#include "j_wifi.h"
 // jsonplaceholder.typicode.com
 
 void initWIFI() {
   // Moden + Router
-  char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
-  char wifiPassword[] = "57hhcumfd8";  // your network password
+  // char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
+  // char wifiPassword[] = "57hhcumfd8";  // your network password
 
-  // char ssid[] = "Jagatees-Phone";  //  your network SSID (name)
-  // char wifiPassword[] = "1234567890";  // your network password
+  // https://stackoverflow.com/questions/67084998/esp32-cant-connect-to-iphone-personal-hotspot
+  // For Iphone need turn on Maximise Coompatibility
+  char ssid[] = "Jagatees-Phone";  //  your network SSID (name)
+  char wifiPassword[] = "1234567890";  // your network password
 
   SerialMonitorInterface.begin(9600);
   WiFi.setPins(8, 2, A3, -1); // VERY IMPORTANT FOR TINYDUINO
