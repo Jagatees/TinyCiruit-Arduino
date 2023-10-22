@@ -3,8 +3,11 @@
 // jsonplaceholder.typicode.com
 
 void initWIFI() {
-  char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
-  char wifiPassword[] = "57hhcumfd8";  // your network password
+  // char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
+  // char wifiPassword[] = "57hhcumfd8";  // your network password
+
+  char ssid[] = "Jagatees-Phone";  //  your network SSID (name)
+  char wifiPassword[] = "1234567890";  // your network password
 
   SerialMonitorInterface.begin(9600);
   WiFi.setPins(8, 2, A3, -1); // VERY IMPORTANT FOR TINYDUINO
@@ -30,10 +33,7 @@ void initWIFI() {
 
 }
 
-
-
-void logicWIFI() {
-  SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.\n");
+void requestAPI() {
 
   // Make an HTTP GET request to the JSONPlaceholder API to fetch posts
   WiFiClient client;
@@ -82,38 +82,22 @@ void logicWIFI() {
 
     const char* abbreviation = doc["abbreviation"]; // "IST"
     SerialMonitorInterface.println(abbreviation);
-
-
-  // // Read and print the response
-  // while (client.connected()) {
-  //   if (client.available()) {
-  //     char c = client.read();
-  //     SerialMonitorInterface.print(c); // Print the response content
-
-  //     StaticJsonDocument<768> doc;
-  //     DeserializationError error = deserializeJson(doc, client);  
-
-  //     // Check for deserialization error
-  //     if (!error) {
-  //       serializeJson(doc, SerialMonitorInterface);        
-  //       SerialMonitorInterface.println(); // Add a newline for formatting
-
-  //       const char* abbreviation = doc["abbreviation"]; // "IST"
-  //       SerialMonitorInterface.print("Abbreviation: ");
-  //       SerialMonitorInterface.println(abbreviation);
-  //     }
-
-
-      
-  //   }
-  // }
-
-
     client.stop();
+
+
     SerialMonitorInterface.println("\nAPI request done");
   } else {
     SerialMonitorInterface.println("Failed to connect to JSONPlaceholder API");
   }
+
+}
+
+
+
+void logicWIFI() {
+  SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.\n");
+
+  requestAPI();
 
   delay(60000); // Wait a minute before going back through the main loop
 }

@@ -13,3 +13,4 @@
 
 void initWIFI();
 void logicWIFI();
+void requestAPI();
