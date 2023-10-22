@@ -68,17 +68,47 @@ void logicWIFI() {
       return;
     }
 
-    
 
-    // Read and print the response
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();
-        SerialMonitorInterface.print(c); // Print the response content
+    // https://arduinojson.org/v6/assistant/#/step1
+    // SAMD21 
+    StaticJsonDocument<768> doc;
+    DeserializationError error = deserializeJson(doc, client);
 
-        
-      }
+    if (error) {
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      return;
     }
+
+    const char* abbreviation = doc["abbreviation"]; // "IST"
+    SerialMonitorInterface.println(abbreviation);
+
+
+  // // Read and print the response
+  // while (client.connected()) {
+  //   if (client.available()) {
+  //     char c = client.read();
+  //     SerialMonitorInterface.print(c); // Print the response content
+
+  //     StaticJsonDocument<768> doc;
+  //     DeserializationError error = deserializeJson(doc, client);  
+
+  //     // Check for deserialization error
+  //     if (!error) {
+  //       serializeJson(doc, SerialMonitorInterface);        
+  //       SerialMonitorInterface.println(); // Add a newline for formatting
+
+  //       const char* abbreviation = doc["abbreviation"]; // "IST"
+  //       SerialMonitorInterface.print("Abbreviation: ");
+  //       SerialMonitorInterface.println(abbreviation);
+  //     }
+
+
+      
+  //   }
+  // }
+
+
     client.stop();
     SerialMonitorInterface.println("\nAPI request done");
   } else {
