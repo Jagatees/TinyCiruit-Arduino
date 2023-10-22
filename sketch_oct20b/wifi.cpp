@@ -1,8 +1,3 @@
-
-#include "wifi.h"
-// jsonplaceholder.typicode.com
-
-
 #include "wifi.h"
 // jsonplaceholder.typicode.com
 
@@ -128,6 +123,7 @@ void requestAPI() {
 void logicWIFI() {
   SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.\n");
 
+  requestAPI();
 
   delay(10000); // Wait a minute before going back through the main loop
 }
