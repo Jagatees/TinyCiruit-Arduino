@@ -1,9 +1,9 @@
 #include "wifi.h"
 
 void setup() {
-  initWIFI();
+  j_initWIFI();
 }
 
 void loop() {
-  logicWIFI();
+  j_logicWIFI();
 }

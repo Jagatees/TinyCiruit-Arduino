@@ -3,7 +3,6 @@
 #include <WiFiClient.h>
 #include <ArduinoJson.h>
 
-
 #if defined(ARDUINO_ARCH_SAMD)
   #define SerialMonitorInterface SerialUSB
 #else
@@ -11,6 +10,6 @@
 #endif
 
 
-void initWIFI();
-void logicWIFI();
-void requestAPI();
+void j_initWIFI();
+void j_logicWIFI();
+void j_makeGetRequest();

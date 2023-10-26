@@ -1,7 +1,7 @@
 #include "wifi.h"
 // jsonplaceholder.typicode.com
 
-void initWIFI() {
+void j_initWIFI() {
   // Moden + Router
   char ssid[] = "SINGTEL-C8NA";  //  your network SSID (name)
   char wifiPassword[] = "57hhcumfd8";  // your network password
@@ -31,6 +31,9 @@ void initWIFI() {
     delay(500);
   }
 
+
+  
+
   // Print out the local IP address
   SerialMonitorInterface.println("");
   SerialMonitorInterface.println("WiFi connected");
@@ -59,10 +62,11 @@ void initWIFI() {
 
 }
 
-void requestAPI() {
+void j_makeGetRequest() {
 
   // Make an HTTP GET request to the JSONPlaceholder API to fetch posts
   WiFiClient client;
+
   if (client.connect("worldtimeapi.org", 80)) {
     SerialMonitorInterface.println("Connected to JSONPlaceholder API");
 
@@ -110,22 +114,20 @@ void requestAPI() {
     SerialMonitorInterface.println(abbreviation);
     client.stop();
 
-
-    SerialMonitorInterface.println("\nAPI request done");
   } else {
-    SerialMonitorInterface.println("Failed to connect to JSONPlaceholder API");
+    SerialMonitorInterface.println("Connection failed.");
   }
 
+  client.stop();
 }
 
 
-
-void logicWIFI() {
+void j_logicWIFI() {
   SerialMonitorInterface.print("Main loop entered. Now that we're connected, let's do something cool.\n");
 
-  requestAPI();
+  // j_makeGetRequest();
 
-  delay(10000); // Wait a minute before going back through the main loop
+  delay(60000); // Wait a minute before going back through the main loop
 }
 
 
