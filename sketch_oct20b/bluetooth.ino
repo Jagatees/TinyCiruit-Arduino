@@ -66,6 +66,7 @@ void setup() {
 
 void loop() {
   aci_loop();//Process any ACI commands or events from the NRF8001- main BLE handler, must run often. Keep main loop short.
+  
   if (ble_rx_buffer_len) {//Check if data is available
     display.clearScreen();
     SerialMonitorInterface.print(ble_rx_buffer_len);
@@ -78,7 +79,7 @@ void loop() {
     ble_rx_buffer_len = 0;//clear afer reading
   }
 
-  if (SerialMonitorInterface.available()) {//Check if serial input is available to send
+  if (SerialMonitorInterface.available() || display.getButtons(TSButtonLowerLeft) || display.getButtons(TSButtonLowerRight) ) { //Check if serial input is available to send or a button is pressed
     delay(10);//should catch input
     uint8_t sendBuffer[21];
     uint8_t sendLength = 0;
@@ -98,12 +99,26 @@ void loop() {
       sendLength++;
     }
 
+    if (display.getButtons(TSButtonLowerLeft)) {
+      sendBuffer[0] = 'Y';
+      sendBuffer[1] = 'E';
+      sendBuffer[2] = 'S';
+      sendLength = 3; 
+    }
+    if (display.getButtons(TSButtonLowerRight)) {
+      sendBuffer[0] = 'N';
+      sendBuffer[1] = 'O';
+      sendLength = 2;
+    }
+
+    
     if (SerialMonitorInterface.available()) {
       SerialMonitorInterface.print(F("Input truncated, dropped: "));
       if (SerialMonitorInterface.available()) {
         SerialMonitorInterface.write(SerialMonitorInterface.read());
       }
     }
+
     sendBuffer[sendLength] = '\0'; //Terminate string
     sendLength++;
 
@@ -117,5 +132,6 @@ void loop() {
       SerialMonitorInterface.println(F("TX dropped!"));
     }
   }
+  
 }
 
