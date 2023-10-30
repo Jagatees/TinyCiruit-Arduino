@@ -1,52 +1,6 @@
-//-------------------------------------------------------------------------------
-//  TinyCircuits ST BLE TinyShield UART Example Sketch
-//  Last Updated 2 March 2016
-//
-//  This demo sets up the BlueNRG-MS chipset of the ST BLE module for compatiblity 
-//  with Nordic's virtual UART connection, and can pass data between the Arduino
-//  serial monitor and Nordic nRF UART V2.0 app or another compatible BLE
-//  terminal. This example is written specifically to be fairly code compatible
-//  with the Nordic NRF8001 example, with a replacement UART.ino file with
-//  'aci_loop' and 'BLEsetup' functions to allow easy replacement. 
-//
-//  Written by Ben Rose, TinyCircuits http://tinycircuits.com
-//
-//-------------------------------------------------------------------------------
 
 
-#include <SPI.h>
-#include <STBLE.h>
-
-#include <Wire.h>
-#include <SPI.h>
-#include <TinyScreen.h>
-
-//Library must be passed the board type
-//TinyScreenDefault for TinyScreen shields
-//TinyScreenAlternate for alternate address TinyScreen shields
-//TinyScreenPlus for TinyScreen+
-
-TinyScreen display = TinyScreen(TinyScreenDefault);
-
-
-//Debug output adds extra flash and memory requirements!
-// #ifndef BLE_DEBUG
-// #define BLE_DEBUG true
-// #endif
-
-#if defined (ARDUINO_ARCH_AVR)
-#define SerialMonitorInterface Serial
-#elif defined(ARDUINO_ARCH_SAMD)
-#define SerialMonitorInterface SerialUSB
-#endif
-
-
-uint8_t ble_rx_buffer[21];
-uint8_t ble_rx_buffer_len = 0;
-uint8_t ble_connection_state = false;
-#define PIPE_UART_OVER_BTLE_UART_TX_TX 0
-
-void setup() {
+void bluetoothsetup() {
   SerialMonitorInterface.begin(9600);
   //while (!SerialMonitorInterface); //This line will block until a serial monitor is opened with TinyScreen+! //but it will still work if i dont have it turn on
   BLEsetup();
@@ -64,7 +18,7 @@ void setup() {
 }
 
 
-void loop() {
+void bluetoothloop() {
   aci_loop();//Process any ACI commands or events from the NRF8001- main BLE handler, must run often. Keep main loop short.
   
   if (ble_rx_buffer_len) {//Check if data is available
