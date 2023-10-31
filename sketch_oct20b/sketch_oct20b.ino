@@ -250,6 +250,7 @@ void page_SubMenu1(void) {
   boolean btn_Up_WasDown = false;
   boolean btn_Down_WasDown = false;
   boolean btn_Cancel_WasDown = false;
+  boolean btn_Accept_WasDown = false;
 
   // selected item pointer
   uint8_t sub_Pos = 1;
@@ -304,6 +305,7 @@ void page_SubMenu1(void) {
     if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
     if (btnIsDown(BTN_DOWN)) {btn_Down_WasDown = true;}
     if (btnIsDown(BTN_CANCEL)) {btn_Cancel_WasDown = true;}
+     if (btnIsDown(BTN_ACCEPT)) {btn_Accept_WasDown = true;}
 
 
     // move the pointer down
