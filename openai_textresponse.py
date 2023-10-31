@@ -1,6 +1,6 @@
 import os
 import openai
-openai.api_key = "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"
+openai.api_key = #ask elise for key
 
 completion = openai.ChatCompletion.create(
   model="gpt-3.5-turbo",
