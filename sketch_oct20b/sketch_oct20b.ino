@@ -82,7 +82,7 @@ void setup() {
 // ========================================================================   
 void loop() {
 
-
+  // This new to be running as often as possiable 
   client.loop();
 
   /*if (btnIsDown(TSButtonLowerLeft)) { SerialMonitorInterface.println("ACCEPT"); } 

@@ -4,6 +4,10 @@
 #include <GraphicsBuffer.h>
 #include <SPI.h>
 
+// WIFI & MQTT
+#include <WiFi101.h>
+#include <PubSubClient.h>
+
 #define ROOT_MENU_COUNT 3
 #define SUB_MENU1_COUNT 4
 #define SUB_MENU2_COUNT 5
@@ -44,12 +48,36 @@ unsigned long main_menu_start = 0;
   #define SerialMonitorInterface SerialUSB
 #endif
 
+// WIFI & MQTT VARIABLES 
+
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
+// Create an instance of WiFiClient
+WiFiClient espClient;
+
+// MQTT broker details
+const char* mqttServer = "192.168.1.83";
+const int mqttPort = 1883;
+
+// Create an instance of PubSubClient
+PubSubClient client;
+
+char receivedPayload[256]; // Define a global char array to store the payload
+int payloadLength = 0; // Global variable to store the length of the payload
+
+#if defined(ARDUINO_ARCH_SAMD)
+  #define SerialMonitorInterface SerialUSB
+#else
+  #define SerialMonitorInterface Serial
+#endif
+
 // ========================================================================
 // ||                             SETUP                                 || 
 // ========================================================================         
 void setup() {
-  // put your setup code here, to run once:
-
+  
+  initWiFi();
+  initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(9600);
@@ -63,6 +91,9 @@ void setup() {
 // ========================================================================   
 void loop() {
 
+
+  // This new to be running as often as possiable 
+
   /*if (btnIsDown(TSButtonLowerLeft)) { SerialMonitorInterface.println("ACCEPT"); } 
 
   if (btnIsDown(TSButtonUpperLeft)) { SerialMonitorInterface.println("CANCEL");} 
@@ -73,10 +104,8 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   if (currPage == LOCK_SCREEN) {
-
     // start tracking the milliseconds
-    page_LockScreen();
-    
+    page_LockScreen(); 
   } else {
       switch(currPage) {
         case LOCK_SCREEN: page_LockScreen(); break;
@@ -253,6 +282,86 @@ void page_RootMenu(void) {
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
   }
+}
+
+
+// =========================================================================
+// ||                          FUNCTION - WIFI                            || 
+// ========================================================================= 
+
+void initWiFi() {
+    SerialMonitorInterface.begin(9600);
+    while (!SerialMonitorInterface); // Wait until serial is ready
+
+    SerialMonitorInterface.println("Starting WiFi initialization...");
+
+    WiFi.setPins(8, 2, A3, -1); // VERY IMPORTANT FOR TINYDUINO
+
+    // Attempt to connect to WiFi
+    SerialMonitorInterface.print("Attempting to connect to WiFi SSID: ");
+    SerialMonitorInterface.println(ssid);
+
+    WiFi.begin(ssid, wifiPassword);
+    while (WiFi.status() != WL_CONNECTED) {
+        SerialMonitorInterface.print(".");
+        delay(500);
+    }
+
+    // Print connection details
+    SerialMonitorInterface.println("");
+    SerialMonitorInterface.println("Successfully connected to WiFi!");
+    IPAddress ip = WiFi.localIP();
+    SerialMonitorInterface.print("Assigned IP address: ");
+    SerialMonitorInterface.println(ip);
+}
+
+// =========================================================================
+// ||                          FUNCTION - MQTT                            || 
+// ========================================================================= 
+
+void initMQTT() {
+    SerialMonitorInterface.println("Setting up MQTT connection...");
+
+    client.setClient(espClient);
+    // Set MQTT broker details
+    client.setServer(mqttServer, mqttPort);
+    client.setCallback(callback);
+
+    // Connect to MQTT broker
+    while (!client.connected()) {
+        SerialMonitorInterface.println("Attempting to connect to MQTT broker...");
+        if (client.connect("mqtt-ardunio-derpee")) {
+            SerialMonitorInterface.println("Successfully connected to MQTT broker!");
+            break;
+        }
+
+        SerialMonitorInterface.println(client.state());
+        SerialMonitorInterface.println("Failed to connect to MQTT broker. Retrying in 5 seconds...");
+        delay(5000);
+    }
+
+    // Subscribe to a topic
+    client.subscribe("Request/API"); 
+    SerialMonitorInterface.println("Request/API");
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+    SerialMonitorInterface.println("Callback invoked!");
+    SerialMonitorInterface.print("Received message on topic '");
+    SerialMonitorInterface.print(topic);
+    SerialMonitorInterface.print("': ");
+    
+    // Copy the payload into the global variable
+    payloadLength = length;
+    for (int i = 0; i < length; i++) {
+        receivedPayload[i] = (char)payload[i];
+    }
+    
+    // Null-terminate the global variable
+    receivedPayload[length] = '\0';
+
+    // Print the received payload
+    SerialMonitorInterface.println(receivedPayload);
 }
 
 

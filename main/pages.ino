@@ -24,18 +24,20 @@ void page_Weather(void) {
 
   // inner loop
   while (true) {
+    
     loopStartMs = millis();
 
-    /*if (loop.client() != "") {
-      weather_result = loop.client();
-      updateDynamicSection = true;
-    } else {
-      weather_result = "No Data yet";
-      updateDynamicSection = true;
-    }*/
+    // if (clietn.client() != "") {
+    //   weather_result = loop.client();
+    //   updateDynamicSection = true;
+    // } else {
+    //   weather_result = "No Data yet";
+    //   updateDynamicSection = true;
+    // }
 
+    client.loop();
     //counter++;
-    //updateDynamicSection = true;
+    updateDynamicSection = true;
     // print the display
     if (updateDisplay) {
     
@@ -65,7 +67,8 @@ void page_Weather(void) {
       display.setCursor(24, 32); // centered to the middle of screen
       //display.print("Counter: ");
       //display.print(counter);
-      //display.print(weather_result);
+
+      display.print(receivedPayload);
 
     }
     // capture button down states
