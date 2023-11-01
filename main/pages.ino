@@ -38,6 +38,7 @@ void page_Weather(void) {
     client.loop();
     //counter++;
     updateDynamicSection = true;
+
     // print the display
     if (updateDisplay) {
     
