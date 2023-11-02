@@ -50,13 +50,13 @@ unsigned long main_menu_start = 0;
 
 // WIFI & MQTT VARIABLES 
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "Jagatees-Phone";
+const char* wifiPassword = "1234567890";
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
+const char* mqttServer = "172.20.10.2";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -341,7 +341,14 @@ void initMQTT() {
     }
 
     // Subscribe to a topic
-    client.subscribe("Request/API"); 
+
+    // HootHoot Quiz 
+    client.subscribe("Hoothoot/Response"); 
+    client.subscribe("Hoothoot/Request"); 
+
+    client.publish("Hoothoot/Request", "option2");
+
+
     SerialMonitorInterface.println("Request/API");
 }
 
