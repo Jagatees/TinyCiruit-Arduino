@@ -87,9 +87,27 @@ class SimpleDictionary {
   public:
     SimpleDictionary() : size(0) {}
 
-    // Add a key-value pair
+   // Check if a key exists in the dictionary and return its index, or -1 if not found
+    int keyIndex(const String& key) {
+      for (int i = 0; i < size; i++) {
+        if (pairs[i].key == key) {
+          return i;  // Key found, return its index.
+        }
+      }
+      return -1;  // Key not found.
+    }
+
+    // Add or update a key-value pair
     bool add(const String& key, const String& value) {
-      if (size < MAX_SIZE) {
+      int index = keyIndex(key);
+      
+      if (index != -1) {
+        // Key already exists, update the value.
+        pairs[index].value = value;
+        return true;
+      } 
+      else if (size < MAX_SIZE) {
+        // Key doesn't exist, and there's space in the dictionary.
         pairs[size].key = key;
         pairs[size].value = value;
         size++;
@@ -97,7 +115,6 @@ class SimpleDictionary {
       }
       return false;  // Dictionary is full.
     }
-
     // Get a value by its key
     String get(const String& key) {
       for (int i = 0; i < size; i++) {
@@ -114,6 +131,8 @@ class SimpleDictionary {
         SerialMonitorInterface.println(pairs[i].key + ": " + pairs[i].value);
       }
     }
+
+   
 };
 
 
