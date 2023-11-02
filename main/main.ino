@@ -15,6 +15,7 @@
 #define LOCK_SCREEN_DURATION 10000 // 60 secs
 #define BLACK 0x0000 // For 16-bit color displays
 
+
 TinyScreen display = TinyScreen(0);
 GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 
@@ -48,15 +49,18 @@ unsigned long main_menu_start = 0;
   #define SerialMonitorInterface SerialUSB
 #endif
 
-// WIFI & MQTT VARIABLES 
+// =========================================================================
+// ||                          VARIABLES - WIFI & MQTT                      || 
+// =========================================================================  
 
-const char* ssid = "Jagatees-Phone";
-const char* wifiPassword = "1234567890";
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
+
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "172.20.10.2";
+const char* mqttServer = "192.168.1.83";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -64,6 +68,58 @@ PubSubClient client;
 
 char receivedPayload[256]; // Define a global char array to store the payload
 int payloadLength = 0; // Global variable to store the length of the payload
+
+// =========================================================================
+// ||                          c++ - dictionary                           || 
+// =========================================================================  
+const int MAX_SIZE = 256;  // Adjust this as needed.
+
+struct KeyValuePair {
+  String key;
+  String value;
+};
+
+class SimpleDictionary {
+  private:
+    KeyValuePair pairs[MAX_SIZE];
+    int size;
+
+  public:
+    SimpleDictionary() : size(0) {}
+
+    // Add a key-value pair
+    bool add(const String& key, const String& value) {
+      if (size < MAX_SIZE) {
+        pairs[size].key = key;
+        pairs[size].value = value;
+        size++;
+        return true;
+      }
+      return false;  // Dictionary is full.
+    }
+
+    // Get a value by its key
+    String get(const String& key) {
+      for (int i = 0; i < size; i++) {
+        if (pairs[i].key == key) {
+          return pairs[i].value;
+        }
+      }
+      return "";  // Not found.
+    }
+
+    // Print the entire dictionary
+    void printAll() {
+      for (int i = 0; i < size; i++) {
+        SerialMonitorInterface.println(pairs[i].key + ": " + pairs[i].value);
+      }
+    }
+};
+
+
+SimpleDictionary dictionary;
+
+
 
 #if defined(ARDUINO_ARCH_SAMD)
   #define SerialMonitorInterface SerialUSB
@@ -75,7 +131,8 @@ int payloadLength = 0; // Global variable to store the length of the payload
 // ||                             SETUP                                 || 
 // ========================================================================         
 void setup() {
-  
+
+  // init
   initWiFi();
   initMQTT();
   // init the serial port to be used as a display return
@@ -345,9 +402,9 @@ void initMQTT() {
     // HootHoot Quiz 
     client.subscribe("Hoothoot/Response"); 
     client.subscribe("Hoothoot/Request"); 
-
-    client.publish("Hoothoot/Request", "option2");
-
+    // client.publish("Hoothoot/Request", "option2");
+    // insert(dict, "Hoothoot/Request", "option2");
+    // print_dictionary(dict);
 
     SerialMonitorInterface.println("Request/API");
 }
@@ -357,7 +414,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     SerialMonitorInterface.print("Received message on topic '");
     SerialMonitorInterface.print(topic);
     SerialMonitorInterface.print("': ");
-    
+  
     // Copy the payload into the global variable
     payloadLength = length;
     for (int i = 0; i < length; i++) {
@@ -367,9 +424,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // Null-terminate the global variable
     receivedPayload[length] = '\0';
 
+    String topicStr = String(topic);
+    String payloadStr = String(receivedPayload);
+
+    SerialMonitorInterface.println("Start long print");
+    dictionary.add(topicStr, payloadStr);
+    dictionary.printAll();
+
     // Print the received payload
     SerialMonitorInterface.println(receivedPayload);
 }
+
+
 
 
 
