@@ -21,7 +21,23 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 
 // use enum to make things more readable and flexible
 // setup the enum with all the menu page options
-enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN, GRAPH_SCREEN, HEART_SCREEN, HOOTHOOT_START_SCREEN, HOOTHOOT_QUIZ_SCREEN, HOOTHOOT_SUBMISSION_SCREEN, ATTENDANCE_SCREEN, ALARM_SCREEN};
+enum pageType { 
+LOCK_SCREEN, 
+ROOT_MENU, 
+SUB_MENU1, 
+SUB_MENU2, 
+SUB_MENU3, 
+WEATHER_SCREEN, 
+TEST_SCREEN,
+GRAPH_SCREEN, 
+HEART_SCREEN, 
+HOOTHOOT_START_SCREEN, 
+HOOTHOOT_QUIZ_SCREEN, 
+HOOTHOOT_SUBMISSION_SCREEN, 
+ATTENDANCE_SCREEN, 
+ALARM_SCREEN,
+OPENAI_SCREEN
+};
 
 // holds which page is currently selected
 enum  pageType currPage = LOCK_SCREEN;
@@ -197,6 +213,7 @@ void loop() {
         case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
         case ALARM_SCREEN: page_Alarm(); break;
         //case ATTENDANCE_SCREEN: page_Attendance(); break;
+        case OPENAI_SCREEN: page_OpenAI(); break;
       }
 
   }
