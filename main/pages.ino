@@ -20,24 +20,32 @@ void page_Weather(void) {
   // selected item pointer
   uint8_t sub_Pos = 1;
 
-  // stores previous and current strings
-  char weather_result[64] = "";
+  String result; 
+  String temperature;
+  String temperature_min;
+  String temperature_max;
+  String weather_condition;
 
   // inner loop
   while (true) {
     
     loopStartMs = millis();
 
-    // if (clietn.client() != "") {
-    //   weather_result = loop.client();
-    //   updateDynamicSection = true;
-    // } else {
-    //   weather_result = "No Data yet";
-    //   updateDynamicSection = true;
-    // }
-
     client.loop();
-    //counter++;
+   
+    if (dictionary.get("Weather/Response") != "") {  /* Weather condition, Temperature now, Max temperature, Min temperature */
+      result = dictionary.get("Weather/Response");
+
+      int firstComma = result.indexOf(',');
+      int secondComma = result.indexOf(',', firstComma + 1);
+      int thirdComma = result.indexOf(',', secondComma + 1);
+  
+      weather_condition = result.substring(0, firstComma);
+      temperature = result.substring(firstComma + 1, secondComma);
+      temperature_max = result.substring(secondComma + 1, thirdComma);
+      temperature_min = result.substring(thirdComma + 1);
+    }
+    
     updateDynamicSection = true;
 
     // print the display 
@@ -66,22 +74,26 @@ void page_Weather(void) {
       updateDynamicSection = false;
       // call the weather function and get the returned string
       // print the items
+      //display.setCursor(24, 32); // centered to the middle of screen
+
+    if (dictionary.get("Weather/Response") == "") {
       display.setCursor(24, 32); // centered to the middle of screen
-    /*display.setCursor(0, 10); 
-      display.print("Temperature: ");
-
+      display.print("No data yet");
+    } else {
       display.setCursor(0, 10); 
-      display.print("Temperature Now: ");
+      display.print("Temperature: " + temperature);
 
-      display.setCursor(0, 10); 
-      display.print("Weather Condition: ");
+      display.setCursor(0, 20); 
+      display.print("Condition: " + weather_condition);
 
-      display.setCursor(0, 10); 
-      display.print("Min Temperature: ");
+      display.setCursor(0, 30); 
+      display.print("Min: " + temperature_min);
 
-      display.setCursor(0, 10); 
-      display.print("Max Temperature: ");*/
-      display.print(receivedPayload);
+      display.setCursor(0, 40); 
+      display.print("Max: " + temperature_max);
+      //display.print(receivedPayload);
+    }
+
 
     }
     // capture button down states
@@ -109,8 +121,8 @@ void page_Weather(void) {
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
   }
+  
 }
-
 // =========================================================================
 // ||                          PAGE - TEST PAGE                           || 
 // =========================================================================  
