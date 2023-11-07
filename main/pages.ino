@@ -313,6 +313,9 @@ void page_HootHootQuiz(void) {
   while (true) {
     loopStartMs = millis();
 
+    client.loop();
+
+
     
     if(dictionary.get("HootHoot/Question1/Option1") == "A") {
       result1 = dictionary.get("HootHoot/Question1/Option1");
@@ -356,9 +359,6 @@ void page_HootHootQuiz(void) {
         if (user_input == "B") {
           client.publish("HootHoot/Answer" , "B");
         }
-
-
-        display.print("You have chosen: " + user_input);
       }
 
       display.setCursor(24, 45);  
@@ -409,16 +409,16 @@ void page_HootHootSubmission(void) {
 
   // selected item pointer
   uint8_t sub_Pos = 1;
-  String result1;
-  String result2;
-
   //int centerX = (display.width() - (display.textWidth(result1 + result2))) / 2;
 
   // inner loop
   while (true) {
     loopStartMs = millis();
 
-    String result = dictionary.get("Hoothoot/UserAnswer");
+    client.loop();
+
+
+    String result = dictionary.get("HootHoot/ProfAnswer");
 
     // print the display
     if (updateDisplay) {

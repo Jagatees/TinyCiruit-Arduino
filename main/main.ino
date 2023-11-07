@@ -147,8 +147,8 @@ SimpleDictionary dictionary;
 void setup() {
 
   // init
-  //initWiFi();
-  //initMQTT();
+  initWiFi();
+  initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -182,7 +182,7 @@ void loop() {
         //case GRAPH_SCREEN: page_Graph(); break;
         case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
         case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
-        case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission; break;
+        case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
         case ALARM_SCREEN: page_Alarm(); break;
         //case ATTENDANCE_SCREEN: page_Attendance(); break;
       }
@@ -398,8 +398,8 @@ void initMQTT() {
     client.subscribe("HootHoot/Question1/Option2"); 
     SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
-    client.subscribe("HootHoot/QuestionAnswer"); 
-    SerialMonitorInterface.println("HootHoot/Question1/Option2");
+    client.subscribe("HootHoot/ProfAnswer"); 
+    SerialMonitorInterface.println("HootHoot/ProfAnswer");
 
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
@@ -425,7 +425,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String topicStr = String(topic);
     String payloadStr = String(receivedPayload);
 
-    SerialMonitorInterface.println("Start long print");
     dictionary.add(topicStr, payloadStr);
     dictionary.printAll();
 
