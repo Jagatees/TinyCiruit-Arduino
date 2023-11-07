@@ -200,13 +200,17 @@ void page_HootHootStart(void) {
   // selected item pointer
   uint8_t sub_Pos = 1;
 
-  String result = dictionary.get("HootHoot/Start");
-  
 
+
+  String result = dictionary.get("Hoothoot/Start");
+  
 
   // inner loop
   while (true) {
     loopStartMs = millis();
+
+    client.loop();
+
 
     // print the display
     if (updateDisplay) {
@@ -292,7 +296,6 @@ void page_HootHootQuiz(void) {
   // inner loop
   while (true) {
     loopStartMs = millis();
-
     // print the display
     if (updateDisplay) {
       // clear the update flag

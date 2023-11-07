@@ -60,7 +60,7 @@ const char* wifiPassword = "1234567890";
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
+const char* mqttServer = "172.20.10.2";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -147,8 +147,8 @@ SimpleDictionary dictionary;
 void setup() {
 
   // init
-  //initWiFi();
-  //initMQTT();
+  initWiFi();
+  initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -157,7 +157,7 @@ void setup() {
   display.setBrightness(10);
   display.setFlip(true);
 
-  dictionary.add("HootHoot/Start", "True");
+  // dictionary.add("HootHoot/Start", "True");
 }
 // ========================================================================
 // ||                             MAIN LOOP                              || 
@@ -167,6 +167,7 @@ void loop() {
 
   // This new to be running as often as possiable 
   // put your main code here, to run repeatedly:
+  client.loop();
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -393,8 +394,8 @@ void initMQTT() {
     // Subscribe to a topic
 
     // HootHoot Quiz 
-    client.subscribe("Hoothoot/Response"); 
-    client.subscribe("Hoothoot/Request"); 
+    client.subscribe("Hoothoot/Start"); 
+    // client.subscribe("Hoothoot/Request"); 
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
     // print_dictionary(dict);
