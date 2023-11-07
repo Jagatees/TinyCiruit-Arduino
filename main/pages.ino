@@ -1,3 +1,5 @@
+#include <PubSubClient.h>
+
 // =========================================================================
 // ||                          PAGE - WEATHER SCREEN                      || 
 // =========================================================================  
@@ -201,9 +203,6 @@ void page_HootHootStart(void) {
   uint8_t sub_Pos = 1;
 
 
-
-
-
   // inner loop
   while (true) {
     loopStartMs = millis();
@@ -223,7 +222,7 @@ void page_HootHootStart(void) {
 
       // print arrow buttons
       printBtnArrows();
-
+ 
       // menu title
       display.setCursor(0, 0); 
       display.print("[ HOOTHOOT START ]");
@@ -340,8 +339,19 @@ void page_HootHootQuiz(void) {
       // print the items
       display.setCursor(0, 32); 
       if (user_input != "") {
+
+        if (user_input == "A") {
+          client.publish("HootHoot/Answer" , "A");
+        }
+
+        if (user_input == "B") {
+          client.publish("HootHoot/Answer" , "B");
+        }
+
+
         display.print("You have chosen: " + user_input);
       }
+
       display.setCursor(24, 45);  
       display.print(result1);
 
