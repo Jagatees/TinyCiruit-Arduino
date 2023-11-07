@@ -21,7 +21,7 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 
 // use enum to make things more readable and flexible
 // setup the enum with all the menu page options
-enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN, GRAPH_SCREEN, HEART_SCREEN, HOOTHOOT_START_SCREEN, HOOTHOOT_QUIZ_SCREEN};
+enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN, GRAPH_SCREEN, HEART_SCREEN, HOOTHOOT_START_SCREEN, HOOTHOOT_QUIZ_SCREEN, HOOTHOOT_SUBMISSION_SCREEN, ATTENDANCE_SCREEN, ALARM_SCREEN};
 
 // holds which page is currently selected
 enum  pageType currPage = LOCK_SCREEN;
@@ -156,12 +156,6 @@ void setup() {
   display.setFont(thinPixel7_10ptFontInfo);
   display.setBrightness(10);
   display.setFlip(true);
-
-  // dictionary.add("HootHoot/Start", "True");
-  //dictionary.add("HootHoot/Question1/Option1", "A");
-  //dictionary.add("HootHoot/Question1/Option2", "B");
-
-  //dictionary.add("HootHoot/Question1", "B");
 }
 // ========================================================================
 // ||                             MAIN LOOP                              || 
@@ -188,6 +182,9 @@ void loop() {
         //case GRAPH_SCREEN: page_Graph(); break;
         case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
         case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
+        case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission; break;
+        case ALARM_SCREEN: page_Alarm(); break;
+        //case ATTENDANCE_SCREEN: page_Attendance(); break;
       }
 
   }
