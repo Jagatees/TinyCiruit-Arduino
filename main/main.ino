@@ -36,7 +36,8 @@ HOOTHOOT_QUIZ_SCREEN,
 HOOTHOOT_SUBMISSION_SCREEN, 
 ATTENDANCE_SCREEN, 
 ALARM_SCREEN,
-OPENAI_SCREEN
+OPENAI_SCREEN,
+SILENTHELPER_SCREEN
 };
 
 // holds which page is currently selected
@@ -213,6 +214,7 @@ void loop() {
         case ALARM_SCREEN: page_Alarm(); break;
         //case ATTENDANCE_SCREEN: page_Attendance(); break;
         case OPENAI_SCREEN: page_OpenAI(); break;
+        case SILENTHELPER_SCREEN: page_SilentHelper(); break;
       }
 
   }
