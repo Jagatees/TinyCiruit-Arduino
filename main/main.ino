@@ -407,6 +407,9 @@ void initMQTT() {
     client.subscribe("HootHoot/Question1/Option2"); 
     SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
+    client.subscribe("HootHoot/QuestionAnswer"); 
+    SerialMonitorInterface.println("HootHoot/Question1/Option2");
+
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
     // print_dictionary(dict);
