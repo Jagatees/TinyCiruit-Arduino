@@ -143,7 +143,7 @@ void page_SubMenu2(void) {
 
       // menu title
       display.setCursor(0, 0); 
-      display.print("[ SYSTEM APPS #2 ]");
+      display.print("[ SYSTEM APPS ]");
 
       // print a divider line
       printDivider();
@@ -165,7 +165,7 @@ void page_SubMenu2(void) {
       printSelected(2, sub_Pos); display.print("Alarm");
 
       display.setCursor(0, 30);
-      printSelected(3, sub_Pos); display.print("Third Item");
+      printSelected(3, sub_Pos); display.print("SILENT HELPER");
     }
     // capture button down states
     if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
@@ -191,7 +191,7 @@ void page_SubMenu2(void) {
       switch (sub_Pos) {
         case 1: currPage = ATTENDANCE_SCREEN; return;
         case 2: currPage = TEST_SCREEN; return;
-        case 3: currPage = HOOTHOOT_START_SCREEN; return;
+        case 3: currPage = SILENTHELPER_SCREEN; return;
       }
     }
 
