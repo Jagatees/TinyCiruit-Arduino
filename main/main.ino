@@ -24,7 +24,7 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN, GRAPH_SCREEN, HEART_SCREEN, HOOTHOOT_START_SCREEN, HOOTHOOT_QUIZ_SCREEN};
 
 // holds which page is currently selected
-enum  pageType currPage = HOOTHOOT_QUIZ_SCREEN;
+enum  pageType currPage = LOCK_SCREEN;
 
 enum State { MAIN_MENU, MQTT };
 
@@ -53,14 +53,14 @@ unsigned long main_menu_start = 0;
 // ||                          VARIABLES - WIFI & MQTT                      || 
 // =========================================================================  
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "Jagatees-Phone";
+const char* wifiPassword = "1234567890";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
+const char* mqttServer = "172.20.10.2";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -147,8 +147,8 @@ SimpleDictionary dictionary;
 void setup() {
 
   // init
-  //initWiFi();
-  //initMQTT();
+  initWiFi();
+  initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -157,9 +157,9 @@ void setup() {
   display.setBrightness(10);
   display.setFlip(true);
 
-  dictionary.add("HootHoot/Start", "True");
+  // dictionary.add("HootHoot/Start", "True");
   dictionary.add("HootHoot/Question1/Option1", "A");
-    dictionary.add("HootHoot/Question1/Option2", "B");
+  dictionary.add("HootHoot/Question1/Option2", "B");
 
   //dictionary.add("HootHoot/Question1", "B");
 }
@@ -171,6 +171,7 @@ void loop() {
 
   // This new to be running as often as possiable 
   // put your main code here, to run repeatedly:
+  client.loop();
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -397,13 +398,13 @@ void initMQTT() {
     // Subscribe to a topic
 
     // HootHoot Quiz 
-    client.subscribe("Hoothoot/Response"); 
-    client.subscribe("Hoothoot/Request"); 
+    client.subscribe("HootHoot/Start"); 
+    SerialMonitorInterface.println("HootHoot/Start");
+
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
     // print_dictionary(dict);
 
-    SerialMonitorInterface.println("Request/API");
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {

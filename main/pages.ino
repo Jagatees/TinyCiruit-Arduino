@@ -38,7 +38,7 @@ void page_Weather(void) {
     //counter++;
     updateDynamicSection = true;
 
-    // print the display
+    // print the display 
     if (updateDisplay) {
     
       // clear the update flag
@@ -200,13 +200,16 @@ void page_HootHootStart(void) {
   // selected item pointer
   uint8_t sub_Pos = 1;
 
-  String result = dictionary.get("HootHoot/Start");
-  
+
+
 
 
   // inner loop
   while (true) {
     loopStartMs = millis();
+
+
+    client.loop();
 
     // print the display
     if (updateDisplay) {
@@ -232,6 +235,9 @@ void page_HootHootStart(void) {
       // call the weather function and get the returned string
       // print the items
       display.setCursor(24, 32); 
+
+      String result = dictionary.get("HootHoot/Start");
+
       if (result == "True") {
         readyToStartQuiz = true;
         display.print("Quiz is ready");
