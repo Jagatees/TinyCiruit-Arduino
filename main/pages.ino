@@ -522,14 +522,17 @@ void page_OpenAI(void) {
   String prof_result;
   String openai_result;
 
+  client.loop();
+
+
   // inner loop
   while (true) {
     loopStartMs = millis();
 
     client.loop();
 
-    prof_result = dictionary.get("Announcement/Prof/Topic");
-    openai_result = dictionary.get("Announcement/Prof/OpenAI");
+    prof_result = dictionary.get("tele/Response");
+    openai_result = dictionary.get("tele/SuggestedResponse");
 
     // print the display
     if (updateDisplay) {
@@ -563,11 +566,9 @@ void page_OpenAI(void) {
           display.setCursor(0, 45); 
           display.print("Response sent!");
         }
-
-      } else {
-        display.setCursor(0, 45); 
-        display.print(sentResponse);
       }
+
+     
     // 2 buttons, one to respond with openAI_result, one go back to main menu
     }
 
@@ -577,6 +578,7 @@ void page_OpenAI(void) {
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      client.publish("tele/Request" , "True");
       sentResponse = true;
       updateDynamicSection = true;
       btn_Down_WasDown = false;

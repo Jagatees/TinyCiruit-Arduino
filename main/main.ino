@@ -171,8 +171,7 @@ void setup() {
   // init
   initWiFi();
   initMQTT();
-
-
+ 
   // place here due to wanting it to be called at start so we can get dater
   client.publish("Weather/Request", "True");
 
@@ -433,6 +432,20 @@ void initMQTT() {
     // Weather API QUIZ 
       client.subscribe("Weather/Response"); 
       SerialMonitorInterface.println("Weather/Response");
+
+
+    //Annocment & OPEN AI
+      client.subscribe("tele/Response");
+      SerialMonitorInterface.println("tele/Response");
+
+      client.subscribe("tele/SuggestedResponse");
+      SerialMonitorInterface.println("tele/SuggestedResponse");
+
+
+      // if nothing then no need to use send NULL
+     // client.publish("tele/Request" , "wahtt they chose")
+       // if nothing then no need to use send NULL
+     // client.publish("SlientHelper/Student" , "Jagatees")
 
 
 
