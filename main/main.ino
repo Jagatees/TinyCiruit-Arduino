@@ -21,10 +21,10 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 
 // use enum to make things more readable and flexible
 // setup the enum with all the menu page options
-enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN };
+enum pageType { LOCK_SCREEN, ROOT_MENU, SUB_MENU1, SUB_MENU2, SUB_MENU3, WEATHER_SCREEN, TEST_SCREEN, GRAPH_SCREEN, HEART_SCREEN, HOOTHOOT_START_SCREEN, HOOTHOOT_QUIZ_SCREEN};
 
 // holds which page is currently selected
-enum  pageType currPage = WEATHER_SCREEN;
+enum  pageType currPage = HOOTHOOT_START_SCREEN;
 
 enum State { MAIN_MENU, MQTT };
 
@@ -53,11 +53,8 @@ unsigned long main_menu_start = 0;
 // ||                          VARIABLES - WIFI & MQTT                      || 
 // =========================================================================  
 
-// const char* ssid = "SINGTEL-C8NA";
-// const char* wifiPassword = "57hhcumfd8";
-
-const char* ssid = "Jagatees-Phone";
-const char* wifiPassword = "1234567890";
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
@@ -134,14 +131,9 @@ class SimpleDictionary {
         SerialMonitorInterface.println(pairs[i].key + ": " + pairs[i].value);
       }
     }
-
-   
 };
 
-
 SimpleDictionary dictionary;
-
-
 
 #if defined(ARDUINO_ARCH_SAMD)
   #define SerialMonitorInterface SerialUSB
@@ -155,15 +147,17 @@ SimpleDictionary dictionary;
 void setup() {
 
   // init
-  initWiFi();
-  initMQTT();
+  //initWiFi();
+  //initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
-  SerialMonitorInterface.begin(9600);
+  SerialMonitorInterface.begin(20000);
   display.begin();
   display.setFont(thinPixel7_10ptFontInfo);
   display.setBrightness(10);
   display.setFlip(true);
+
+  dictionary.add("HootHoot/Start", "True");
 }
 // ========================================================================
 // ||                             MAIN LOOP                              || 
@@ -172,14 +166,6 @@ void loop() {
 
 
   // This new to be running as often as possiable 
-
-  /*if (btnIsDown(TSButtonLowerLeft)) { SerialMonitorInterface.println("ACCEPT"); } 
-
-  if (btnIsDown(TSButtonUpperLeft)) { SerialMonitorInterface.println("CANCEL");} 
-
-  if (btnIsDown(TSButtonUpperRight)) { SerialMonitorInterface.println("UP");} 
-
-  if (btnIsDown(TSButtonLowerRight)) {  SerialMonitorInterface.println("DOWN");} */
   // put your main code here, to run repeatedly:
 
   if (currPage == LOCK_SCREEN) {
@@ -194,25 +180,10 @@ void loop() {
         case SUB_MENU3: page_SubMenu3(); break;
         case WEATHER_SCREEN: page_Weather(); break;
         case TEST_SCREEN: page_Test(); break;
+        //case GRAPH_SCREEN: page_Graph(); break;
+        case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
+        case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
       }
-    /*switch(currState) {
-      case MAIN_MENU:
-        switch(currPage) {
-          case LOCK_SCREEN: page_LockScreen(); break;
-          case ROOT_MENU: page_RootMenu(); break;
-          case SUB_MENU1: page_SubMenu1(); break;
-          case SUB_MENU2: page_SubMenu2(); break;
-          case SUB_MENU3: page_SubMenu3(); break;
-          case WEATHER_SCREEN: page_Weather(); break;
-          case TEST_SCREEN: page_Test(); break;
-        }
-        break;
-      case MQTT:
-        //client.loop();
-        break;
-      default:
-        break;
-    }*/
 
   }
 }
@@ -419,38 +390,11 @@ void initMQTT() {
         delay(5000);
     }
 
-    // Quiz
-      // Hoothoot/Start = True or False
-      client.subscribe("Hoothoot/Start");
+    // Subscribe to a topic
 
-      // Hoot/Question1 = List of Options
-      client.subscribe("Hoothoot/Question1") 
-
-      // Hoothoot/Question1/Answer = A
-      client.subscribe("Hoothoot/Question1/Answer")
-
-    //Weather API
-      //WeatherAPI/Data = value / null
-      client.subscribe("WeatherAPI/Data")
-
-    //RTC API
-      //Time/Data = value / null
-      client.subscribe("Time/Data")
-
-    //Game 
-      //Leaderboard = List[]
-      client.subscribe("Leaderboard")
-
-    //telebot 
-      //response = value
-      client.subscribe("tele/Response")
-      //SuggestedResponse = value
-      client.subscribe("tele/SuggestedResponse")
-
-
-
-
-
+    // HootHoot Quiz 
+    client.subscribe("Hoothoot/Response"); 
+    client.subscribe("Hoothoot/Request"); 
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
     // print_dictionary(dict);

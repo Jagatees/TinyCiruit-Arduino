@@ -57,7 +57,7 @@ void page_SubMenu1(void) {
       printSelected(2, sub_Pos); display.print("Test Counter");
 
       display.setCursor(0, 30);
-      printSelected(3, sub_Pos); display.print("Third Item");
+      printSelected(3, sub_Pos); display.print("Hoot Hoot");
 
       // print a divider line
       display.setCursor(0, 50);
@@ -88,6 +88,7 @@ void page_SubMenu1(void) {
       switch (sub_Pos) {
         case 1: currPage = WEATHER_SCREEN; return;
         case 2: currPage = TEST_SCREEN; return;
+        case 3: currPage = HOOTHOOT_START_SCREEN; return;
       }
     }
     // move to the root menu
