@@ -171,6 +171,7 @@ void page_SubMenu2(void) {
     if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
     if (btnIsDown(BTN_DOWN)) {btn_Down_WasDown = true;}
     if (btnIsDown(BTN_CANCEL)) {btn_Cancel_WasDown = true;}
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
 
 
     // move the pointer down
