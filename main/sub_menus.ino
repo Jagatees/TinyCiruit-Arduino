@@ -95,7 +95,7 @@ void page_SubMenu1(void) {
       switch (sub_Pos) {
         case 1: currPage = WEATHER_SCREEN; return;
         case 2: currPage = HOOTHOOT_START_SCREEN; return;
-        //case 3: currPage = OPEN_AI_SCREEN; return;
+        case 3: currPage = OPENAI_SCREEN; return;
         //case 4: currPage = SILENT_HELPER_SCREEN; return;
         case 5: currPage = TEST_SCREEN; return;
       }
