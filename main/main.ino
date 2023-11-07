@@ -53,14 +53,20 @@ unsigned long main_menu_start = 0;
 // ||                          VARIABLES - WIFI & MQTT                      || 
 // =========================================================================  
 
-const char* ssid = "Jagatees-Phone";
-const char* wifiPassword = "1234567890";
+
+// Jagateees Iphone
+// const char* ssid = "Jagatees-Phone";
+// const char* wifiPassword = "1234567890";
+
+// Jagatees house router
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "172.20.10.2";
+const char* mqttServer = "192.168.1.83";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -149,6 +155,12 @@ void setup() {
   // init
   initWiFi();
   initMQTT();
+
+
+  // place here due to wanting it to be called at start so we can get dater
+  client.publish("Weather/Request", "TRUE");
+
+
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -389,17 +401,23 @@ void initMQTT() {
     // Subscribe to a topic
 
     // HootHoot Quiz 
-    client.subscribe("HootHoot/Start"); 
-    SerialMonitorInterface.println("HootHoot/Start");
+      client.subscribe("HootHoot/Start"); 
+      SerialMonitorInterface.println("HootHoot/Start");
 
-    client.subscribe("HootHoot/Question1/Option1"); 
-    SerialMonitorInterface.println("HootHoot/Question1/Option1");
+      client.subscribe("HootHoot/Question1/Option1"); 
+      SerialMonitorInterface.println("HootHoot/Question1/Option1");
 
-    client.subscribe("HootHoot/Question1/Option2"); 
-    SerialMonitorInterface.println("HootHoot/Question1/Option2");
+      client.subscribe("HootHoot/Question1/Option2"); 
+      SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
-    client.subscribe("HootHoot/ProfAnswer"); 
-    SerialMonitorInterface.println("HootHoot/ProfAnswer");
+      client.subscribe("HootHoot/ProfAnswer"); 
+      SerialMonitorInterface.println("HootHoot/ProfAnswer");
+
+    // Weather API QUIZ 
+      client.subscribe("Weather/Response"); 
+      SerialMonitorInterface.println("Weather/Response");
+
+
 
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
