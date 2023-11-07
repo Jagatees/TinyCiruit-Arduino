@@ -53,8 +53,8 @@ unsigned long main_menu_start = 0;
 // ||                          VARIABLES - WIFI & MQTT                      || 
 // =========================================================================  
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "Jagatees-Phone";
+const char* wifiPassword = "1234567890";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
