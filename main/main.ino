@@ -158,7 +158,7 @@ void setup() {
 
 
   // place here due to wanting it to be called at start so we can get dater
-  client.publish("Weather/Request", "TRUE");
+  client.publish("Weather/Request", "True");
 
 
   // init the serial port to be used as a display return
