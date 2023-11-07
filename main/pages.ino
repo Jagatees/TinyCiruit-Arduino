@@ -448,9 +448,13 @@ void page_HootHootSubmission(void) {
         display.print("You have chosen: " + user_input);
       }
 
-      display.setCursor(0, 45); 
-      display.print("Waiting for answer...");
-      
+      if (result != "") {
+        display.setCursor(0, 45); 
+        display.print("Correct answer: " + result);
+      } else {
+        display.setCursor(0, 45); 
+        display.print("Waiting for answer...");
+      }
 
     }
     // capture button down states
@@ -477,8 +481,13 @@ void page_HootHootSubmission(void) {
 // ||                         PAGE - ALARM PAGE                           || 
 // =========================================================================  
 void page_Alarm(void) {
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
 
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+  }
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
-  }
 }

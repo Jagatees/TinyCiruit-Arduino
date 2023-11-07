@@ -95,8 +95,8 @@ void page_SubMenu1(void) {
       switch (sub_Pos) {
         case 1: currPage = WEATHER_SCREEN; return;
         case 2: currPage = HOOTHOOT_START_SCREEN; return;
-        case 3: currPage = OPEN_AI_SCREEN; return;
-        case 4: currPage = SILENT_HELPER_SCREEN; return;
+        //case 3: currPage = OPEN_AI_SCREEN; return;
+        //case 4: currPage = SILENT_HELPER_SCREEN; return;
         case 5: currPage = TEST_SCREEN; return;
       }
     }
@@ -121,7 +121,8 @@ void page_SubMenu2(void) {
   boolean btn_Up_WasDown = false;
   boolean btn_Down_WasDown = false;
   boolean btn_Cancel_WasDown = false;
-
+  boolean btn_Accept_WasDown = false; 
+  
   // selected item pointer
   uint8_t sub_Pos = 1;
   // inner loop

@@ -147,8 +147,8 @@ SimpleDictionary dictionary;
 void setup() {
 
   // init
-  initWiFi();
-  initMQTT();
+  //initWiFi();
+  //initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -432,7 +432,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
     // Print the received payload
     SerialMonitorInterface.println(receivedPayload);
 }
-
 
 
 
