@@ -60,10 +60,7 @@ void page_SubMenu1(void) {
       printSelected(3, sub_Pos); display.print("Open AI");
 
       display.setCursor(0, 40);
-      printSelected(4, sub_Pos); display.print("Silent Helper");
-
-      display.setCursor(0, 50);
-      printSelected(5, sub_Pos); display.print("Test Counter");
+      printSelected(4, sub_Pos); display.print("Test Counter");
 
 
 
@@ -96,7 +93,6 @@ void page_SubMenu1(void) {
         case 1: currPage = WEATHER_SCREEN; return;
         case 2: currPage = HOOTHOOT_START_SCREEN; return;
         case 3: currPage = OPENAI_SCREEN; return;
-        //case 4: currPage = SILENT_HELPER_SCREEN; return;
         case 5: currPage = TEST_SCREEN; return;
       }
     }
