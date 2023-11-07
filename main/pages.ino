@@ -557,14 +557,21 @@ void page_OpenAI(void) {
       updateDynamicSection = false;
        
       if (prof_result != "") {
-        display.setCursor(0, 32);
+        display.setCursor(0, 22);
         display.print(prof_result);
       }
 
       if (openai_result != "") {
+
+          
         if (sentResponse) {
-          display.setCursor(0, 45); 
+          display.setCursor(0, 42); 
           display.print("Response sent!");
+        } else {
+          display.setCursor(0, 32); 
+          display.print("Suggested Response:");
+          display.setCursor(0, 42); 
+          display.print(openai_result);
         }
       }
 
