@@ -53,8 +53,11 @@ unsigned long main_menu_start = 0;
 // ||                          VARIABLES - WIFI & MQTT                      || 
 // =========================================================================  
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+// const char* ssid = "SINGTEL-C8NA";
+// const char* wifiPassword = "57hhcumfd8";
+
+const char* ssid = "Jagatees-Phone";
+const char* wifiPassword = "1234567890";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
@@ -416,11 +419,38 @@ void initMQTT() {
         delay(5000);
     }
 
-    // Subscribe to a topic
+    // Quiz
+      // Hoothoot/Start = True or False
+      client.subscribe("Hoothoot/Start");
 
-    // HootHoot Quiz 
-    client.subscribe("Hoothoot/Response"); 
-    client.subscribe("Hoothoot/Request"); 
+      // Hoot/Question1 = List of Options
+      client.subscribe("Hoothoot/Question1") 
+
+      // Hoothoot/Question1/Answer = A
+      client.subscribe("Hoothoot/Question1/Answer")
+
+    //Weather API
+      //WeatherAPI/Data = value / null
+      client.subscribe("WeatherAPI/Data")
+
+    //RTC API
+      //Time/Data = value / null
+      client.subscribe("Time/Data")
+
+    //Game 
+      //Leaderboard = List[]
+      client.subscribe("Leaderboard")
+
+    //telebot 
+      //response = value
+      client.subscribe("tele/Response")
+      //SuggestedResponse = value
+      client.subscribe("tele/SuggestedResponse")
+
+
+
+
+
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
     // print_dictionary(dict);
