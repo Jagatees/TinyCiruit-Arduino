@@ -67,9 +67,20 @@ void page_Weather(void) {
       // call the weather function and get the returned string
       // print the items
       display.setCursor(24, 32); // centered to the middle of screen
-      //display.print("Counter: ");
-      //display.print(counter);
+    /*display.setCursor(0, 10); 
+      display.print("Temperature: ");
 
+      display.setCursor(0, 10); 
+      display.print("Temperature Now: ");
+
+      display.setCursor(0, 10); 
+      display.print("Weather Condition: ");
+
+      display.setCursor(0, 10); 
+      display.print("Min Temperature: ");
+
+      display.setCursor(0, 10); 
+      display.print("Max Temperature: ");*/
       display.print(receivedPayload);
 
     }
@@ -276,11 +287,12 @@ void page_HootHootStart(void) {
 // =========================================================================
 // ||                     PAGE - HOOTHOOT QUIZ PAGE                      || 
 // =========================================================================  
+String user_input;
+
 void page_HootHootQuiz(void) {
   // flag for updating the display
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
-  boolean endQuiz = false;
   
   // tracks when entered top of loop
   uint32_t loopStartMs;
@@ -296,9 +308,6 @@ void page_HootHootQuiz(void) {
   uint8_t sub_Pos = 1;
   String result1;
   String result2;
-  String user_input;
-
-  //int centerX = (display.width() - (display.textWidth(result1 + result2))) / 2;
 
   // inner loop
   while (true) {
@@ -365,19 +374,109 @@ void page_HootHootQuiz(void) {
 
     
     // move the pointer up
-    if (btn_Down_WasDown && btnIsUp(BTN_DOWN) && !btn_Down_Disabled) {
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
       user_input = result2;
       updateDynamicSection = true;
       btn_Down_WasDown = false;
-      btn_Down_Disabled = true;
+      currPage = HOOTHOOT_SUBMISSION_SCREEN; break;
     } 
     // move to the root menu
-    if (btn_Up_WasDown && btnIsUp(BTN_UP) && !btn_Up_Disabled) { 
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) { 
       user_input = result1;
       updateDynamicSection = true;
       btn_Up_WasDown = false;
-      btn_Up_Disabled = true;
+      currPage = HOOTHOOT_SUBMISSION_SCREEN; break;
     }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+// =========================================================================
+// ||                PAGE - HOOTHOOT SUBMISSION PAGE                      || 
+// =========================================================================  
+void page_HootHootSubmission(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+  
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Down_WasDown = false;
+  boolean btn_Up_WasDown = false;
+
+  // selected item pointer
+  uint8_t sub_Pos = 1;
+  String result1;
+  String result2;
+
+  //int centerX = (display.width() - (display.textWidth(result1 + result2))) / 2;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    String result = dictionary.get("Hoothoot/UserAnswer");
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10); // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0); 
+      display.print("[ HOOTHOOT SUBMISSION ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+      // call the weather function and get the returned string
+      // print the items
+      display.setCursor(0, 32); 
+      if (user_input != "") {
+        display.print("You have chosen: " + user_input);
+      }
+
+      display.setCursor(0, 45); 
+      display.print("Waiting for answer...");
+      
+
+    }
+    // capture button down states
+    if (btnIsDown(BTN_DOWN)) {btn_Down_WasDown = true;}
+    if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
+
+    
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    } 
+    // move to the root menu
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) { 
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+// =========================================================================
+// ||                         PAGE - ALARM PAGE                           || 
+// =========================================================================  
+void page_Alarm(void) {
 
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
