@@ -208,7 +208,6 @@ void page_HootHootStart(void) {
   while (true) {
     loopStartMs = millis();
 
-
     client.loop();
 
     // print the display
@@ -236,6 +235,7 @@ void page_HootHootStart(void) {
       // print the items
       display.setCursor(24, 32); 
 
+      client.loop();
       String result = dictionary.get("HootHoot/Start");
 
       if (result == "True") {

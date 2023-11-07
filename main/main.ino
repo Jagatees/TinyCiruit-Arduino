@@ -158,8 +158,8 @@ void setup() {
   display.setFlip(true);
 
   // dictionary.add("HootHoot/Start", "True");
-  dictionary.add("HootHoot/Question1/Option1", "A");
-  dictionary.add("HootHoot/Question1/Option2", "B");
+  //dictionary.add("HootHoot/Question1/Option1", "A");
+  //dictionary.add("HootHoot/Question1/Option2", "B");
 
   //dictionary.add("HootHoot/Question1", "B");
 }
@@ -400,6 +400,12 @@ void initMQTT() {
     // HootHoot Quiz 
     client.subscribe("HootHoot/Start"); 
     SerialMonitorInterface.println("HootHoot/Start");
+
+    client.subscribe("HootHoot/Question1/Option1"); 
+    SerialMonitorInterface.println("HootHoot/Question1/Option1");
+
+    client.subscribe("HootHoot/Question1/Option2"); 
+    SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
     // client.publish("Hoothoot/Request", "option2");
     // insert(dict, "Hoothoot/Request", "option2");
