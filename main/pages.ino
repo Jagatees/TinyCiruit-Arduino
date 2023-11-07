@@ -598,3 +598,85 @@ void page_OpenAI(void) {
     while (millis() - loopStartMs < 25) { delay(2); }
   }
 }
+// =========================================================================
+// ||                  PAGE - SILENTHELPER PAGE                           ||
+// =========================================================================
+void page_silentHelper(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+  boolean sentResponse = false;
+
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+
+  String prof_result;
+  String openai_result;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ SILENT HELPER ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+
+      display.setCursor(0, 22);
+      display.print("Do you require help?");
+
+      display.setCursor(0, 32); 
+      display.print("Press down button");
+
+      if (sentResponse) {
+        display.setCursor(0, 42);
+        display.print("Response sent!");
+      }
+
+      // 2 buttons, one to respond with openAI_result, one go back to main menu
+    }
+
+    // capture button down states
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      sentResponse = true;
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU1;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
