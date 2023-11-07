@@ -267,12 +267,6 @@ void page_RootMenu(void) {
       // clear the update flag
       updateDisplay = false;
 
-      // print the items
-      //Serial.println(F("First Selectable Item"));
-      //Serial.println(F("Second Selectable Item"));
-      //Serial.println(F("Third Selectable Item"));
-      //Serial.println(F("Fourth Selectable Item"));
-
       // clear the display
       clearScreen();
 
