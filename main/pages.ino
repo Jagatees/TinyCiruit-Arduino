@@ -617,6 +617,7 @@ void page_silentHelper(void) {
   String prof_result;
   String openai_result;
 
+
   // inner loop
   while (true) {
     loopStartMs = millis();
@@ -652,6 +653,7 @@ void page_silentHelper(void) {
       display.print("Press down button");
 
       if (sentResponse) {
+        client.publish("SlientHelper/Asker" , "StudentName");
         display.setCursor(0, 42);
         display.print("Response sent!");
       }
