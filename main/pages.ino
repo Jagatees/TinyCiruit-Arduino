@@ -200,17 +200,13 @@ void page_HootHootStart(void) {
   // selected item pointer
   uint8_t sub_Pos = 1;
 
-
-
-  String result = dictionary.get("Hoothoot/Start");
+  String result = dictionary.get("HootHoot/Start");
   
+
 
   // inner loop
   while (true) {
     loopStartMs = millis();
-
-    client.loop();
-
 
     // print the display
     if (updateDisplay) {
@@ -279,23 +275,40 @@ void page_HootHootQuiz(void) {
   // flag for updating the display
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
-
+  boolean endQuiz = false;
+  
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
   //tracks button states
-  boolean btn_Up_WasDown = false;
   boolean btn_Down_WasDown = false;
-  boolean btn_Accept_WasDown = false;
+  boolean btn_Up_WasDown = false;
+
+  boolean btn_Down_Disabled = false;
+  boolean btn_Up_Disabled = false;
 
   // selected item pointer
   uint8_t sub_Pos = 1;
+  String result1;
+  String result2;
+  String user_input;
 
-  String result = dictionary.get("HootHoot/Question1");
-  
+  //int centerX = (display.width() - (display.textWidth(result1 + result2))) / 2;
+
   // inner loop
   while (true) {
     loopStartMs = millis();
+
+    
+    if(dictionary.get("HootHoot/Question1/Option1") == "A") {
+      result1 = dictionary.get("HootHoot/Question1/Option1");
+    } 
+
+    if(dictionary.get("HootHoot/Question1/Option2") == "B") {
+      result2 = dictionary.get("HootHoot/Question1/Option2");
+    } 
+
+
     // print the display
     if (updateDisplay) {
       // clear the update flag
@@ -319,35 +332,36 @@ void page_HootHootQuiz(void) {
       updateDynamicSection = false;
       // call the weather function and get the returned string
       // print the items
-      display.setCursor(24, 32); 
-      if (result != "") {
-        //display.print(result.);
-      } else {
-        display.print("Quiz has yet to start");
+      display.setCursor(0, 32); 
+      if (user_input != "") {
+        display.print("You have chosen: " + user_input);
       }
-      
+      display.setCursor(24, 45);  
+      display.print(result1);
+
+      display.setCursor(64, 45); 
+      display.print(result2);
 
     }
     // capture button down states
-    if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
     if (btnIsDown(BTN_DOWN)) {btn_Down_WasDown = true;}
-    if (btnIsDown(BTN_ACCEPT)) {btn_Accept_WasDown = true;}
+    if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
 
-        // move the pointer down
-    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-        updateDynamicSection = true;
-        btn_Down_WasDown = false;
-      
-    } 
-
+    
     // move the pointer up
-    if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN) && !btn_Down_Disabled) {
+      user_input = result2;
       updateDynamicSection = true;
-      btn_Up_WasDown = false;
-      
+      btn_Down_WasDown = false;
+      btn_Down_Disabled = true;
     } 
     // move to the root menu
-    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) { if (!updateDynamicSection) { updateDynamicSection = true; } ; return; }
+    if (btn_Up_WasDown && btnIsUp(BTN_UP) && !btn_Up_Disabled) { 
+      user_input = result1;
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+      btn_Up_Disabled = true;
+    }
 
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
