@@ -1,0 +1,250 @@
+// alarm and homescreen clock code
+// still lacking ht's buzzer code for alarm & need to get time set by user from vanessa for void loop
+
+#include <TinyScreen.h> //include TinyScreen library
+#include <TimeLib.h> //include the Arduino Time library
+#include <RTCZero.h> //include the Arduino Zero's Real Time Clock library
+#include <stdio.h>  // include the C++ standard IO library
+#include <Wire.h>
+#include <GraphicsBuffer.h>
+/* Create an rtc object */
+RTCZero rtc;
+
+// We'll dynamically change these values to set the current initial time
+// No need to change them here.
+byte seconds = 0;
+byte minutes = 45;
+byte hours = 9;
+
+// We'll dynamically change these values to set the current initial date
+// The preset values are only examples.
+byte days = 13;
+byte months = 3;
+byte years = 16;
+
+int brightness = 15; // We'll set it, 3 - 15 based on time of day
+
+//TinyScreen display = TinyScreen(TinyScreenPlus); //Create the TinyScreen object
+TinyScreen display = TinyScreen(0);
+GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
+
+void setup()
+{
+  char s_month[5];
+  int tmonth, tday, tyear, thour, tminute, tsecond;
+  static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+  Wire.begin();
+  display.begin();
+  
+  display.setBrightness(10);
+  display.setFlip(true);
+  //display.begin();                            //Initializes TinyScreen board
+  //display.setFlip(1);                         //Flips the TinyScreen rightside up for O Watch
+  display.on();                               //Turns TinyScreen display on
+  
+
+  rtc.begin(); // initialize RTC
+  
+  // Set the time and date. Change this to your current date and time.
+  // setTime(16,19,00,12,3,2016);    //values in the order hr,min,sec,day,month,year
+
+  // __DATE__ is a C++ preprocessor string with the current date in it.
+  // It will look something like 'Mar  13  2016'.
+  // So we need to pull those values out and convert the month string to a number.
+  sscanf(__DATE__, "%s %d %d", s_month, &tday, &tyear);
+
+  // Similarly, __TIME__ will look something like '09:34:17' so get those numbers.
+  sscanf(__TIME__, "%d:%d:%d", &thour, &tminute, &tsecond);
+
+  // Find the position of this month's string inside month_names, do a little
+  // pointer subtraction arithmetic to get the offset, and divide the
+  // result by 3 since the month names are 3 chars long.
+  tmonth = (strstr(month_names, s_month) - month_names) / 3;
+
+  months = tmonth + 1;  // The RTC library expects months to be 1 - 12.
+  days = tday;
+  years = tyear - 2000; // The RTC library expects years to be from 2000.
+  hours = thour;
+  minutes = tminute;
+  seconds = tsecond;
+
+  rtc.setTime(hours, minutes, seconds);
+  rtc.setDate(days, months, years);
+}
+
+void drawCircle(int x0, int y0, int radius, uint8_t color)
+{
+  int x = radius;
+  int y = 0;
+  int radiusError = 1-x;
+ 
+  while(x >= y)
+  {
+    //drawPixel(x,y,color);//set pixel (x,y) to specified color. This is slow because we need to send commands setting the x and y, then send the pixel data.
+    display.drawPixel(x + x0, y + y0, color);
+    display.drawPixel(y + x0, x + y0, color);
+    display.drawPixel(-x + x0, y + y0, color);
+    display.drawPixel(-y + x0, x + y0, color);
+    display.drawPixel(-x + x0, -y + y0, color);
+    display.drawPixel(-y + x0, -x + y0, color);
+    display.drawPixel(x + x0, -y + y0, color);
+    display.drawPixel(y + x0, -x + y0, color);
+    y++;
+    if (radiusError<0)
+    {
+      radiusError += 2 * y + 1;
+    }
+    else
+    {
+      x--;
+      radiusError += 2 * (y - x) + 1;
+    }
+  }
+}
+
+void drawHand(int xStart, int yStart, int angle, int radius, unsigned char color)
+
+{
+  static int sine[16] = {0, 27, 54, 79, 104, 128, 150, 171, 190, 201, 221, 233, 243, 250, 254, 255};
+  int xEnd, yEnd, quadrant, x_flip, y_flip;
+
+  // calculate which quadrant the hand lies in
+  quadrant = angle/15 ;
+
+  switch ( quadrant )
+  {
+    case 0 : x_flip = 1 ; y_flip = -1 ; break ;
+    case 1 : angle = abs(angle-30) ; x_flip = y_flip = 1 ; break ;
+    case 2 : angle = angle-30 ; x_flip = -1 ; y_flip = 1 ; break ;
+    case 3 : angle = abs(angle-60) ; x_flip = y_flip = -1 ; break ; 
+    default:  x_flip = y_flip = 1; // this should not happen
+  }
+
+  xEnd = xStart;
+  yEnd = yStart;
+  xEnd += (x_flip * (( sine[angle] * radius ) >> 8));
+  yEnd += (y_flip * (( sine[15-angle] * radius ) >> 8));
+
+  display.drawLine(xStart, yStart, xEnd, yEnd, color);
+}
+
+
+void displayTime()
+{
+  display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font background
+  display.setFont(thinPixel7_10ptFontInfo);
+  display.on();                           
+
+ enum
+ {
+    clockCenterX = 65,
+    clockCenterY = 32,
+    clockCircleRadius = 30,
+    clockCircleColor = TS_8b_Red,
+    clockMinuteHandLength = 28,
+    clockMinuteHandColor = TS_8b_White,
+    clockHourHandLength = 18,
+    clockHourHandColor = TS_8b_White,
+    clockSecondHandLength = 28,
+    clockSecondHandColor = TS_8b_Yellow
+  };
+
+  drawCircle(clockCenterX, clockCenterY, clockCircleRadius, clockCircleColor);
+  
+  for (int i = 1; i < 15; i++) // Display for 15*1000 milliseconds (15 seconds), update display each second
+  {
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);  
+    months = rtc.getMonth();
+    days = rtc.getDay();
+    years = rtc.getYear();
+    hours = rtc.getHours();
+    minutes = rtc.getMinutes();
+    seconds = rtc.getSeconds();
+    int hourAngle;
+    if (hours >= 12)
+      hourAngle = hours - 12;
+    else
+      hourAngle = hours;
+    hourAngle *= 5;
+    hourAngle += minutes / 12;
+    
+    
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, clockHourHandColor);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, clockMinuteHandColor);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, clockSecondHandColor);
+    
+
+    if (hours <= 12)
+      brightness = hours + 3; // 0 hours = 3 brightness, noon = 15
+    else if (hours >= 18)
+      brightness = (24 - hours) * 2 + 2;  // 23 hours = 4 brightness, 18 hours = 14
+    else
+      brightness = 15; // full brightness all afternoon
+    if (brightness < 3)
+      brightness = 3;
+    if (brightness > 15)
+      brightness = 15;
+    display.setBrightness(brightness);
+    display.setCursor(0,8); //Set the cursor where you want to start printing the date
+    if(months < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(months);
+    display.print("/");
+    days = rtc.getDay();
+    if (days < 10) display.print(0);
+    display.print(days); 
+    // display.print("/");
+    // display.print(years);
+
+    display.setCursor(0,25); //Set the cursor where you want to start printing the date  
+    setTime(hours,minutes,seconds,days,months,2000 +  years);    //values in the order hr,min,sec,day,month,year
+    char wkday[16];
+    strcpy(wkday, dayStr(weekday()));
+    wkday[3] = ' '; wkday[4] = '\0';
+    display.print(wkday); // To keep the text compact, only print the first 3 letters.
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);   //Set the font type
+
+    // display time in HH:MM:SS 24 hour format
+    display.setCursor(0,45); //Set the cursor where you want to start printing the time
+    if(hours < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(hours);
+    display.print(":");
+    if(minutes < 10) display.print(0); //print a leading 0 if minute value is less than 0
+    display.print(minutes);
+
+   
+    delay(1000); //display for 1 seconds
+    
+    // Now erase the clock hands by drawing them in black.
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, TS_8b_Black);
+  }
+}
+bool isOn = true;
+void alarmClock(){
+  while (display.getButtons()==0){
+  display.setFont(liberationSans_16ptFontInfo);
+  display.setBrightness(10);
+  display.setFlip(true);
+  display.fontColor(TS_8b_White, TS_8b_Red);
+  display.setCursor(5, 20);
+  display.print("Wake up!!");
+  if (isOn) {
+    display.off(); // Turn off the display
+  } else {
+    display.on(); // Turn on the display
+  }
+  isOn = !isOn;
+
+  delay(700); // Adjust the delay to control the blinking rate
+} display.clearScreen();
+displayTime();}
+
+void loop()
+{
+  display.on();
+  // if the time set in other file is == to rtc, then run alarmClock function, else run displayTime()
+  alarmClock();
+}
