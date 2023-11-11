@@ -1,8 +1,11 @@
-#include <TimeLib.h>
+/* General Libraries*/
+#include <SPI.h>
 #include <Wire.h>
+#include <stdio.h>
+
+/* Screen Libraries*/
 #include <TinyScreen.h>
 #include <GraphicsBuffer.h>
-#include <SPI.h>
 
 /* WIFI & MQTT */
 #include <WiFi101.h>
@@ -12,13 +15,17 @@
 #include <SD.h>
 #include <AudioZero.h>
 
+/* Clock Libraries */
+#include <TimeLib.h>
+#include <RTCZero.h>
+
+/* Menu Definitions */
 #define ROOT_MENU_COUNT 3
 #define SUB_MENU1_COUNT 4
 #define SUB_MENU2_COUNT 6
 #define SUB_MENU3_COUNT 2
 #define LOCK_SCREEN_DURATION 10000  // 60 secs
 #define BLACK 0x0000                // For 16-bit color displays
-
 
 TinyScreen display = TinyScreen(0);
 GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
@@ -43,12 +50,13 @@ enum pageType {
   OPENAI_SCREEN,
   SILENTHELPER_SCREEN,
   AUDIO_SCREEN,
-  GAME_SCREEN
+  GAME_SCREEN,
+  OXIMETER_SCREEN
   //TELEBOT_SCREEN
 };
 
 // holds which page is currently selected
-enum pageType currPage = GAME_SCREEN;
+enum pageType currPage = OXIMETER_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -62,10 +70,8 @@ const int BTN_CANCEL = TSButtonUpperLeft;
 // track timer when leaving the lock screen
 unsigned long main_menu_start = 0;
 
-// set up variables using the SD utility library functions:
-Sd2Card card;
-SdVolume volume;
-SdFile root;
+/* RTC */
+RTCZero rtc;
 
 // Make Serial Monitor compatible for all TinyCircuits processors
 #if defined(ARDUINO_ARCH_AVR)
@@ -94,6 +100,25 @@ PubSubClient client;
 char receivedPayload[256];  // Define a global char array to store the payload
 int payloadLength = 0;      // Global variable to store the length of the payload
 
+// =========================================================================
+// ||                          VARIABLES - RTC                            ||
+// =========================================================================
+// We'll dynamically change these values to set the current initial time
+// No need to change them here.
+byte seconds = 0;
+byte minutes = 45;
+byte hours = 9;
+
+// We'll dynamically change these values to set the current initial date
+// The preset values are only examples.
+byte days = 13;
+byte months = 3;
+byte years = 16;
+
+// declare alarm variables
+int alarmHour = 0;
+int alarmMinute = 0;
+bool alarmSet = false;
 // =========================================================================
 // ||                          c++ - dictionary                           ||
 // =========================================================================
@@ -170,10 +195,14 @@ SimpleDictionary dictionary;
 // ||                             SETUP                                 ||
 // ========================================================================
 void setup() {
+  char s_month[5];
+  int tmonth, tday, tyear, thour, tminute, tsecond;
+  static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
   // init
   //initWiFi();
   //initMQTT();
+
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
@@ -182,33 +211,69 @@ void setup() {
   }
 
   /* Check if SD card is working */
-  SerialMonitorInterface.print("Initializing SD card...");
+  SerialMonitorInterface.println("Initializing SD card...");
 
   if (!SD.begin(10)) {
     SerialMonitorInterface.println("Failed");
     while(true);
   }
 
+  /* RTC */
+  rtc.begin();
+  // Set the time and date. Change this to your current date and time.
+  // setTime(16,19,00,12,3,2016);    //values in the order hr,min,sec,day,month,year
+
+  // __DATE__ is a C++ preprocessor string with the current date in it.
+  // It will look something like 'Mar  13  2016'.
+  // So we need to pull those values out and convert the month string to a number.
+  sscanf(__DATE__, "%s %d %d", s_month, &tday, &tyear);
+
+  // Similarly, __TIME__ will look something like '09:34:17' so get those numbers.
+  sscanf(__TIME__, "%d:%d:%d", &thour, &tminute, &tsecond);
+
+  // Find the position of this month's string inside month_names, do a little
+  // pointer subtraction arithmetic to get the offset, and divide the
+  // result by 3 since the month names are 3 chars long.
+  tmonth = (strstr(month_names, s_month) - month_names) / 3;
+
+  months = tmonth + 1;  // The RTC library expects months to be 1 - 12.
+  days = tday;
+  years = tyear - 2000; // The RTC library expects years to be from 2000.
+  hours = thour;
+  minutes = tminute;
+  seconds = tsecond;
+
+  rtc.setTime(hours, minutes, seconds);
+  rtc.setDate(days, months, years);
+
+  /* Display */
   display.begin();
   display.setFont(thinPixel7_10ptFontInfo);
   display.setBrightness(10);
   display.setFlip(true);
 
   //dictionary.add("Weather/Response", "Rainy,25,30,20");
-  dictionary.add("Announcement/Prof/Topic", "How are you today?");
-  dictionary.add("Announcement/Prof/OpenAI", "I am fine.");
+  //dictionary.add("Announcement/Prof/Topic", "How are you today?");
+  //dictionary.add("Announcement/Prof/OpenAI", "I am fine.");
+} 
 
-
-}
 // ========================================================================
 // ||                             MAIN LOOP                              ||
 // ========================================================================
 void loop() {
-
-
   // This new to be running as often as possiable
   // put your main code here, to run repeatedly:
   client.loop();
+
+  /* check and compare rtc time to set alarm */
+  /*
+    while (true) {
+      if (setAlarm) {
+        // when comparison is correct, buzzer = on;
+      }
+    }
+
+  */
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -232,6 +297,7 @@ void loop() {
       case SILENTHELPER_SCREEN: page_SilentHelper(); break;
       case AUDIO_SCREEN: page_Audio(); break;
       case GAME_SCREEN: page_Game(); break;
+      case OXIMETER_SCREEN: page_Oximeter(); break;
       //case TELEBOT_SCREEN: page_Telebot(); break;
     }
   }
@@ -272,10 +338,49 @@ void page_LockScreen(void) {
 
       // print arrow buttons
       printBtnArrows();
-
-      //print date time for lockscreen
-      printDateTime();
     }
+
+    months = rtc.getMonth();
+    days = rtc.getDay();
+    years = rtc.getYear();
+    hours = rtc.getHours();
+    minutes = rtc.getMinutes();
+    seconds = rtc.getSeconds();
+
+    // Print date in US format MM:DD:YY (Switch the order in which day, month, year that you like to use)
+    display.setCursor(15, 8);  //Set the cursor where you want to start printing the date
+    if (months < 10) { display.print(0); }
+    display.print(months);
+    display.print("/");
+    if (days < 10) { display.print(0); }
+    display.print(days);
+    display.print("/");
+    display.print(years);
+
+    display.setCursor(30, 25);  //Set the cursor where you want to start printing the date
+    setTime(hours, minutes, seconds, days, months, 2000 + years);
+    char wkday[16];
+    strcpy(wkday, dayStr(weekday()));
+    wkday[3] = ' ';
+    wkday[4] = '\0';
+    display.print(wkday);
+
+    //display.setFont(liberationSansNarrow_16ptFontInfo);   //Set the font type
+
+    // display time in HH:MM:SS 24 hour format
+    display.setCursor(20, 45);          //Set the cursor where you want to start printing the time
+    if (hour() < 10) display.print(0);  //print a leading 0 if hour value is less than 0
+    display.print(hours);
+    display.print(":");
+    if (minute() < 10) display.print(0);  //print a leading 0 if minute value is less than 0
+    display.print(minutes);
+    display.print(":");
+    if (second() < 10) display.print(0);  //print a leading 0 if seconds value is less than 0
+    display.print(seconds);
+    display.print(" ");  //just a empty space after the seconds
+    //delay(1000); //delay 60 second
+
+
     // capture button down states
     if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
 
@@ -339,7 +444,7 @@ void page_RootMenu(void) {
 
       display.setCursor(0, 20);
       printSelected(2, root_Pos);
-      display.print("Sub Menu Two");
+      display.print("System Apps");
 
       display.setCursor(0, 30);
       printSelected(3, root_Pos);

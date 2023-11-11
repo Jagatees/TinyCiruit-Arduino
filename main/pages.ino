@@ -504,20 +504,6 @@ void page_HootHootSubmission(void) {
   }
 }
 // =========================================================================
-// ||                         PAGE - ALARM PAGE                           ||
-// =========================================================================
-void page_Alarm(void) {
-  // tracks when entered top of loop
-  uint32_t loopStartMs;
-
-  // inner loop
-  while (true) {
-    loopStartMs = millis();
-  }
-  // keep a specific pace
-  while (millis() - loopStartMs < 25) { delay(2); }
-}
-// =========================================================================
 // ||                         PAGE - OPENAI PAGE                           ||
 // =========================================================================
 void page_OpenAI(void) {
@@ -749,6 +735,192 @@ void page_Audio(void) {
 
       display.setCursor(0, 42);
       display.print("Current Song: Song 1");
+    }
+
+    // capture button down states
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      getAudio();
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU2;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+// =========================================================================
+// ||                         PAGE - ALARM PAGE                           ||
+// =========================================================================
+void set_alarm(int hour, int minute) {
+  alarmHour = hour;
+  alarmMinute = minute;
+  alarmSet = true;
+  
+  SerialMonitorInterface.print(alarmHour);
+  SerialMonitorInterface.print(alarmMinute);
+
+}
+
+void page_Alarm(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Up_WasDown = false;
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+  boolean btn_Accept_WasDown = false;
+
+  int setHour = 0;
+  int setMinute = 0;
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ ALARM ]");
+
+      display.setCursor(24, 10);
+      display.print("Set Alarm");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+      display.setCursor(24, 20);
+      display.print("HH : MM");
+      // Display current input
+      display.setCursor(24, 40);
+      display.print(setHour);
+
+      display.print(" : ");
+
+      display.print(setMinute);
+
+    }
+    // capture button down states
+    if (btnIsDown(BTN_UP)) { btn_Up_WasDown = true; }
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      setHour = (setHour + 1) % 24;
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+    }
+
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      setMinute = (setMinute + 10) % 60;
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU2;
+      return;
+    }
+
+    // move to the root menu
+    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
+      set_alarm(setHour, setMinute);
+      btn_Accept_WasDown = false;
+    }
+  // keep a specific pace
+  while (millis() - loopStartMs < 25) { delay(2); }
+
+  }
+
+}
+// =========================================================================
+// ||                      PAGE - OXIMETER PAGE                           ||
+// =========================================================================
+void page_Oximeter(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+
+  // selected item pointer
+  uint8_t sub_Pos = 1;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ OXIMETER ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+      // Display SpO2
+
+      display.setCursor(10, 20);
+      display.print("SpO2: ");
+      display.print("8");
+      display.print("%");
+
+      // Display heart rate
+      display.setCursor(5, 40);
+      display.print("Heart Rate: ");
+      display.print("80");
+      display.print(" BPM");
     }
 
     // capture button down states
