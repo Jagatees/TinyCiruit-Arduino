@@ -4,16 +4,20 @@
 #include <GraphicsBuffer.h>
 #include <SPI.h>
 
-// WIFI & MQTT
+/* WIFI & MQTT */
 #include <WiFi101.h>
 #include <PubSubClient.h>
 
+/* Audio Libraries */
+#include <SD.h>
+#include <AudioZero.h>
+
 #define ROOT_MENU_COUNT 3
 #define SUB_MENU1_COUNT 4
-#define SUB_MENU2_COUNT 5
+#define SUB_MENU2_COUNT 6
 #define SUB_MENU3_COUNT 2
-#define LOCK_SCREEN_DURATION 10000 // 60 secs
-#define BLACK 0x0000 // For 16-bit color displays
+#define LOCK_SCREEN_DURATION 10000  // 60 secs
+#define BLACK 0x0000                // For 16-bit color displays
 
 
 TinyScreen display = TinyScreen(0);
@@ -21,31 +25,30 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 
 // use enum to make things more readable and flexible
 // setup the enum with all the menu page options
-enum pageType { 
-LOCK_SCREEN, 
-ROOT_MENU, 
-SUB_MENU1, 
-SUB_MENU2, 
-SUB_MENU3, 
-WEATHER_SCREEN, 
-TEST_SCREEN,
-GRAPH_SCREEN, 
-HEART_SCREEN, 
-HOOTHOOT_START_SCREEN, 
-HOOTHOOT_QUIZ_SCREEN, 
-HOOTHOOT_SUBMISSION_SCREEN, 
-ATTENDANCE_SCREEN, 
-ALARM_SCREEN,
-OPENAI_SCREEN,
-SILENTHELPER_SCREEN
+enum pageType {
+  LOCK_SCREEN,
+  ROOT_MENU,
+  SUB_MENU1,
+  SUB_MENU2,
+  SUB_MENU3,
+  WEATHER_SCREEN,
+  TEST_SCREEN,
+  GRAPH_SCREEN,
+  HEART_SCREEN,
+  HOOTHOOT_START_SCREEN,
+  HOOTHOOT_QUIZ_SCREEN,
+  HOOTHOOT_SUBMISSION_SCREEN,
+  ATTENDANCE_SCREEN,
+  ALARM_SCREEN,
+  OPENAI_SCREEN,
+  SILENTHELPER_SCREEN,
+  AUDIO_SCREEN,
+  GAME_SCREEN
+  //TELEBOT_SCREEN
 };
 
 // holds which page is currently selected
-enum  pageType currPage = LOCK_SCREEN;
-
-enum State { MAIN_MENU, MQTT };
-
-enum State currState = MAIN_MENU;
+enum pageType currPage = GAME_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -59,42 +62,41 @@ const int BTN_CANCEL = TSButtonUpperLeft;
 // track timer when leaving the lock screen
 unsigned long main_menu_start = 0;
 
+// set up variables using the SD utility library functions:
+Sd2Card card;
+SdVolume volume;
+SdFile root;
+
 // Make Serial Monitor compatible for all TinyCircuits processors
 #if defined(ARDUINO_ARCH_AVR)
-  #define SerialMonitorInterface Serial
+#define SerialMonitorInterface Serial
 #elif defined(ARDUINO_ARCH_SAMD)
-  #define SerialMonitorInterface SerialUSB
+#define SerialMonitorInterface SerialUSB
 #endif
 
 // =========================================================================
-// ||                          VARIABLES - WIFI & MQTT                      || 
-// =========================================================================  
+// ||                          VARIABLES - WIFI & MQTT                      ||
+// =========================================================================
 
-
-// Jagateees Iphone
-// const char* ssid = "Jagatees-Phone";
-// const char* wifiPassword = "1234567890";
-
-// Jagatees house router
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "Jagatees-Phone";
+const char* wifiPassword = "1234567890";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
+const char* mqttServer = "172.20.10.2";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
 PubSubClient client;
 
-char receivedPayload[256]; // Define a global char array to store the payload
-int payloadLength = 0; // Global variable to store the length of the payload
+char receivedPayload[256];  // Define a global char array to store the payload
+int payloadLength = 0;      // Global variable to store the length of the payload
 
 // =========================================================================
-// ||                          c++ - dictionary                           || 
-// =========================================================================  
+// ||                          c++ - dictionary                           ||
+// =========================================================================
 const int MAX_SIZE = 256;  // Adjust this as needed.
 
 struct KeyValuePair {
@@ -103,126 +105,141 @@ struct KeyValuePair {
 };
 
 class SimpleDictionary {
-  private:
-    KeyValuePair pairs[MAX_SIZE];
-    int size;
+private:
+  KeyValuePair pairs[MAX_SIZE];
+  int size;
 
-  public:
-    SimpleDictionary() : size(0) {}
+public:
+  SimpleDictionary()
+    : size(0) {}
 
-   // Check if a key exists in the dictionary and return its index, or -1 if not found
-    int keyIndex(const String& key) {
-      for (int i = 0; i < size; i++) {
-        if (pairs[i].key == key) {
-          return i;  // Key found, return its index.
-        }
-      }
-      return -1;  // Key not found.
-    }
-
-    // Add or update a key-value pair
-    bool add(const String& key, const String& value) {
-      int index = keyIndex(key);
-      
-      if (index != -1) {
-        // Key already exists, update the value.
-        pairs[index].value = value;
-        return true;
-      } 
-      else if (size < MAX_SIZE) {
-        // Key doesn't exist, and there's space in the dictionary.
-        pairs[size].key = key;
-        pairs[size].value = value;
-        size++;
-        return true;
-      }
-      return false;  // Dictionary is full.
-    }
-    // Get a value by its key
-    String get(const String& key) {
-      for (int i = 0; i < size; i++) {
-        if (pairs[i].key == key) {
-          return pairs[i].value;
-        }
-      }
-      return "";  // Not found.
-    }
-
-    // Print the entire dictionary
-    void printAll() {
-      for (int i = 0; i < size; i++) {
-        SerialMonitorInterface.println(pairs[i].key + ": " + pairs[i].value);
+  // Check if a key exists in the dictionary and return its index, or -1 if not found
+  int keyIndex(const String& key) {
+    for (int i = 0; i < size; i++) {
+      if (pairs[i].key == key) {
+        return i;  // Key found, return its index.
       }
     }
+    return -1;  // Key not found.
+  }
+
+  // Add or update a key-value pair
+  bool add(const String& key, const String& value) {
+    int index = keyIndex(key);
+
+    if (index != -1) {
+      // Key already exists, update the value.
+      pairs[index].value = value;
+      return true;
+    } else if (size < MAX_SIZE) {
+      // Key doesn't exist, and there's space in the dictionary.
+      pairs[size].key = key;
+      pairs[size].value = value;
+      size++;
+      return true;
+    }
+    return false;  // Dictionary is full.
+  }
+  // Get a value by its key
+  String get(const String& key) {
+    for (int i = 0; i < size; i++) {
+      if (pairs[i].key == key) {
+        return pairs[i].value;
+      }
+    }
+    return "";  // Not found.
+  }
+
+  // Print the entire dictionary
+  void printAll() {
+    for (int i = 0; i < size; i++) {
+      SerialMonitorInterface.println(pairs[i].key + ": " + pairs[i].value);
+    }
+  }
 };
 
 SimpleDictionary dictionary;
 
 #if defined(ARDUINO_ARCH_SAMD)
-  #define SerialMonitorInterface SerialUSB
+#define SerialMonitorInterface SerialUSB
 #else
-  #define SerialMonitorInterface Serial
+#define SerialMonitorInterface Serial
 #endif
 
 // ========================================================================
-// ||                             SETUP                                 || 
-// ========================================================================         
+// ||                             SETUP                                 ||
+// ========================================================================
 void setup() {
 
   // init
-  initWiFi();
-  initMQTT();
- 
-  // place here due to wanting it to be called at start so we can get dater
-  client.publish("Weather/Request", "True");
-
-
+  //initWiFi();
+  //initMQTT();
   // init the serial port to be used as a display return
   Wire.begin();
   SerialMonitorInterface.begin(20000);
+  while (!SerialMonitorInterface) {
+    ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  /* Check if SD card is working */
+  SerialMonitorInterface.print("Initializing SD card...");
+
+  if (!SD.begin(10)) {
+    SerialMonitorInterface.println("Failed");
+    while(true);
+  }
+
   display.begin();
   display.setFont(thinPixel7_10ptFontInfo);
   display.setBrightness(10);
   display.setFlip(true);
+
+  //dictionary.add("Weather/Response", "Rainy,25,30,20");
+  dictionary.add("Announcement/Prof/Topic", "How are you today?");
+  dictionary.add("Announcement/Prof/OpenAI", "I am fine.");
+
+
 }
 // ========================================================================
-// ||                             MAIN LOOP                              || 
-// ========================================================================   
+// ||                             MAIN LOOP                              ||
+// ========================================================================
 void loop() {
 
 
-  // This new to be running as often as possiable 
+  // This new to be running as often as possiable
   // put your main code here, to run repeatedly:
   client.loop();
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
-    page_LockScreen(); 
+    page_LockScreen();
   } else {
-      switch(currPage) {
-        case LOCK_SCREEN: page_LockScreen(); break;
-        case ROOT_MENU: page_RootMenu(); break;
-        case SUB_MENU1: page_SubMenu1(); break;
-        case SUB_MENU2: page_SubMenu2(); break;
-        case SUB_MENU3: page_SubMenu3(); break;
-        case WEATHER_SCREEN: page_Weather(); break;
-        case TEST_SCREEN: page_Test(); break;
-        //case GRAPH_SCREEN: page_Graph(); break;
-        case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
-        case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
-        case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
-        case ALARM_SCREEN: page_Alarm(); break;
-        //case ATTENDANCE_SCREEN: page_Attendance(); break;
-        case OPENAI_SCREEN: page_OpenAI(); break;
-        case SILENTHELPER_SCREEN: page_silentHelper(); break;
-      }
-
+    switch (currPage) {
+      case LOCK_SCREEN: page_LockScreen(); break;
+      case ROOT_MENU: page_RootMenu(); break;
+      case SUB_MENU1: page_SubMenu1(); break;
+      case SUB_MENU2: page_SubMenu2(); break;
+      case SUB_MENU3: page_SubMenu3(); break;
+      case WEATHER_SCREEN: page_Weather(); break;
+      case TEST_SCREEN: page_Test(); break;
+      //case GRAPH_SCREEN: page_Graph(); break;
+      case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
+      case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
+      case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
+      case ALARM_SCREEN: page_Alarm(); break;
+      //case ATTENDANCE_SCREEN: page_Attendance(); break;
+      case OPENAI_SCREEN: page_OpenAI(); break;
+      case SILENTHELPER_SCREEN: page_SilentHelper(); break;
+      case AUDIO_SCREEN: page_Audio(); break;
+      case GAME_SCREEN: page_Game(); break;
+      //case TELEBOT_SCREEN: page_Telebot(); break;
+    }
   }
 }
 
 // =========================================================================
-// ||                          PAGE - LOCK SCREEN                          || 
-// =========================================================================  
+// ||                          PAGE - LOCK SCREEN                          ||
+// =========================================================================
 
 void page_LockScreen(void) {
   // flag for updating the display
@@ -242,7 +259,7 @@ void page_LockScreen(void) {
 
     // print the display
     if (updateDisplay) {
-    
+
       // clear the update flag
       updateDisplay = false;
 
@@ -251,28 +268,29 @@ void page_LockScreen(void) {
 
       // start the display
       display.begin();
-      display.setBrightness(10); // Set brightness level (0-100)
+      display.setBrightness(10);  // Set brightness level (0-100)
 
       // print arrow buttons
       printBtnArrows();
 
       //print date time for lockscreen
       printDateTime();
-      
     }
     // capture button down states
-    if (btnIsDown(BTN_ACCEPT)) {btn_Accept_WasDown = true;}
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
 
     // move to the root menu
-    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) { currPage = ROOT_MENU; return; }
+    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
+      currPage = ROOT_MENU;
+      return;
+    }
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
   }
-
 }
 // =========================================================================
-// ||                          PAGE - ROOT MENU                           || 
-// =========================================================================  
+// ||                          PAGE - ROOT MENU                           ||
+// =========================================================================
 void page_RootMenu(void) {
 
   // flag for updating the display
@@ -293,7 +311,7 @@ void page_RootMenu(void) {
 
     // print the display
     if (updateDisplay) {
-    
+
       // clear the update flag
       updateDisplay = false;
 
@@ -302,51 +320,62 @@ void page_RootMenu(void) {
 
       // start the display
       display.begin();
-      display.setBrightness(10); // Set brightness level (0-100)
+      display.setBrightness(10);  // Set brightness level (0-100)
 
       // print arrow buttons
       printBtnArrows();
 
       // menu title
-      display.setCursor(0, 0); 
+      display.setCursor(0, 0);
       display.print("[ MAIN MENU ]");
 
       // print a divider line
       printDivider();
 
       // print the items
-      display.setCursor(0, 10); 
-      printSelected(1, root_Pos); display.print("APIs Menu");
-      
+      display.setCursor(0, 10);
+      printSelected(1, root_Pos);
+      display.print("APIs Menu");
+
       display.setCursor(0, 20);
-      printSelected(2, root_Pos); display.print("Sub Menu Two");
+      printSelected(2, root_Pos);
+      display.print("Sub Menu Two");
 
       display.setCursor(0, 30);
-      printSelected(3, root_Pos); display.print("Sub Menu Three");
+      printSelected(3, root_Pos);
+      display.print("Sub Menu Three");
 
       // print a divider line
       display.setCursor(0, 50);
       printDivider();
     }
     // capture button down states
-    if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
-    if (btnIsDown(BTN_DOWN)) {btn_Down_WasDown = true;}
-    if (btnIsDown(BTN_ACCEPT)) {btn_Accept_WasDown = true;}
+    if (btnIsDown(BTN_UP)) { btn_Up_WasDown = true; }
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
 
 
     // move the pointer down
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      if (root_Pos == ROOT_MENU_COUNT) { root_Pos = 1; } else { root_Pos++; }
+      if (root_Pos == ROOT_MENU_COUNT) {
+        root_Pos = 1;
+      } else {
+        root_Pos++;
+      }
       updateDisplay = true;
       btn_Down_WasDown = false;
-    } 
+    }
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      if (root_Pos == 1) { root_Pos = ROOT_MENU_COUNT; } else { root_Pos--; }
+      if (root_Pos == 1) {
+        root_Pos = ROOT_MENU_COUNT;
+      } else {
+        root_Pos--;
+      }
       updateDisplay = true;
       btn_Up_WasDown = false;
-    } 
+    }
 
     if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
       switch (root_Pos) {
@@ -362,127 +391,102 @@ void page_RootMenu(void) {
 
 
 // =========================================================================
-// ||                          FUNCTION - WIFI                            || 
-// ========================================================================= 
+// ||                          FUNCTION - WIFI                            ||
+// =========================================================================
 
 void initWiFi() {
-    SerialMonitorInterface.begin(9600);
-    while (!SerialMonitorInterface); // Wait until serial is ready
+  SerialMonitorInterface.begin(9600);
+  while (!SerialMonitorInterface)
+    ;  // Wait until serial is ready
 
-    SerialMonitorInterface.println("Starting WiFi initialization...");
+  SerialMonitorInterface.println("Starting WiFi initialization...");
 
-    WiFi.setPins(8, 2, A3, -1); // VERY IMPORTANT FOR TINYDUINO
+  WiFi.setPins(8, 2, A3, -1);  // VERY IMPORTANT FOR TINYDUINO
 
-    // Attempt to connect to WiFi
-    SerialMonitorInterface.print("Attempting to connect to WiFi SSID: ");
-    SerialMonitorInterface.println(ssid);
+  // Attempt to connect to WiFi
+  SerialMonitorInterface.print("Attempting to connect to WiFi SSID: ");
+  SerialMonitorInterface.println(ssid);
 
-    WiFi.begin(ssid, wifiPassword);
-    while (WiFi.status() != WL_CONNECTED) {
-        SerialMonitorInterface.print(".");
-        delay(500);
-    }
+  WiFi.begin(ssid, wifiPassword);
+  while (WiFi.status() != WL_CONNECTED) {
+    SerialMonitorInterface.print(".");
+    delay(500);
+  }
 
-    // Print connection details
-    SerialMonitorInterface.println("");
-    SerialMonitorInterface.println("Successfully connected to WiFi!");
-    IPAddress ip = WiFi.localIP();
-    SerialMonitorInterface.print("Assigned IP address: ");
-    SerialMonitorInterface.println(ip);
+  // Print connection details
+  SerialMonitorInterface.println("");
+  SerialMonitorInterface.println("Successfully connected to WiFi!");
+  IPAddress ip = WiFi.localIP();
+  SerialMonitorInterface.print("Assigned IP address: ");
+  SerialMonitorInterface.println(ip);
 }
 
 // =========================================================================
-// ||                          FUNCTION - MQTT                            || 
-// ========================================================================= 
+// ||                          FUNCTION - MQTT                            ||
+// =========================================================================
 
 void initMQTT() {
-    SerialMonitorInterface.println("Setting up MQTT connection...");
+  SerialMonitorInterface.println("Setting up MQTT connection...");
 
-    client.setClient(espClient);
-    // Set MQTT broker details
-    client.setServer(mqttServer, mqttPort);
-    client.setCallback(callback);
+  client.setClient(espClient);
+  // Set MQTT broker details
+  client.setServer(mqttServer, mqttPort);
+  client.setCallback(callback);
 
-    // Connect to MQTT broker
-    while (!client.connected()) {
-        SerialMonitorInterface.println("Attempting to connect to MQTT broker...");
-        if (client.connect("mqtt-ardunio-derpee")) {
-            SerialMonitorInterface.println("Successfully connected to MQTT broker!");
-            break;
-        }
-
-        SerialMonitorInterface.println(client.state());
-        SerialMonitorInterface.println("Failed to connect to MQTT broker. Retrying in 5 seconds...");
-        delay(5000);
+  // Connect to MQTT broker
+  while (!client.connected()) {
+    SerialMonitorInterface.println("Attempting to connect to MQTT broker...");
+    if (client.connect("mqtt-ardunio-derpee")) {
+      SerialMonitorInterface.println("Successfully connected to MQTT broker!");
+      break;
     }
 
-    // Subscribe to a topic
+    SerialMonitorInterface.println(client.state());
+    SerialMonitorInterface.println("Failed to connect to MQTT broker. Retrying in 5 seconds...");
+    delay(5000);
+  }
 
-    // HootHoot Quiz 
-      client.subscribe("HootHoot/Start"); 
-      SerialMonitorInterface.println("HootHoot/Start");
+  // Subscribe to a topic
 
-      client.subscribe("HootHoot/Question1/Option1"); 
-      SerialMonitorInterface.println("HootHoot/Question1/Option1");
+  // HootHoot Quiz
+  client.subscribe("HootHoot/Start");
+  SerialMonitorInterface.println("HootHoot/Start");
 
-      client.subscribe("HootHoot/Question1/Option2"); 
-      SerialMonitorInterface.println("HootHoot/Question1/Option2");
+  client.subscribe("HootHoot/Question1/Option1");
+  SerialMonitorInterface.println("HootHoot/Question1/Option1");
 
-      client.subscribe("HootHoot/ProfAnswer"); 
-      SerialMonitorInterface.println("HootHoot/ProfAnswer");
+  client.subscribe("HootHoot/Question1/Option2");
+  SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
-    // Weather API QUIZ 
-      client.subscribe("Weather/Response"); 
-      SerialMonitorInterface.println("Weather/Response");
+  client.subscribe("HootHoot/ProfAnswer");
+  SerialMonitorInterface.println("HootHoot/ProfAnswer");
 
-
-    //Annocment & OPEN AI
-      client.subscribe("tele/Response");
-      SerialMonitorInterface.println("tele/Response");
-
-      client.subscribe("tele/SuggestedResponse");
-      SerialMonitorInterface.println("tele/SuggestedResponse");
-
-
-      // if nothing then no need to use send NULL
-     // client.publish("tele/Request" , "wahtt they chose")
-       // if nothing then no need to use send NULL
-     // client.publish("SlientHelper/Student" , "Jagatees")
-
-
-
-    // client.publish("Hoothoot/Request", "option2");
-    // insert(dict, "Hoothoot/Request", "option2");
-    // print_dictionary(dict);
-
+  // client.publish("Hoothoot/Request", "option2");
+  // insert(dict, "Hoothoot/Request", "option2");
+  // print_dictionary(dict);
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
-    SerialMonitorInterface.println("Callback invoked!");
-    SerialMonitorInterface.print("Received message on topic '");
-    SerialMonitorInterface.print(topic);
-    SerialMonitorInterface.print("': ");
-  
-    // Copy the payload into the global variable
-    payloadLength = length;
-    for (int i = 0; i < length; i++) {
-        receivedPayload[i] = (char)payload[i];
-    }
-    
-    // Null-terminate the global variable
-    receivedPayload[length] = '\0';
+  SerialMonitorInterface.println("Callback invoked!");
+  SerialMonitorInterface.print("Received message on topic '");
+  SerialMonitorInterface.print(topic);
+  SerialMonitorInterface.print("': ");
 
-    String topicStr = String(topic);
-    String payloadStr = String(receivedPayload);
+  // Copy the payload into the global variable
+  payloadLength = length;
+  for (int i = 0; i < length; i++) {
+    receivedPayload[i] = (char)payload[i];
+  }
 
-    dictionary.add(topicStr, payloadStr);
-    dictionary.printAll();
+  // Null-terminate the global variable
+  receivedPayload[length] = '\0';
 
-    // Print the received payload
-    SerialMonitorInterface.println(receivedPayload);
+  String topicStr = String(topic);
+  String payloadStr = String(receivedPayload);
+
+  dictionary.add(topicStr, payloadStr);
+  dictionary.printAll();
+
+  // Print the received payload
+  SerialMonitorInterface.println(receivedPayload);
 }
-
-
-
-
-
