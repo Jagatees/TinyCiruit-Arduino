@@ -868,7 +868,6 @@ void page_Alarm(void) {
 // =========================================================================
 void page_Oximeter(void) {
 
-
   // flag for updating the display
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
@@ -883,13 +882,16 @@ void page_Oximeter(void) {
   // selected item pointer
   uint8_t sub_Pos = 1;
 
+
+
   // inner loop
   while (true) {
     loopStartMs = millis();
-
     client.loop();
 
-    
+    getPulseAndBuzzer();
+
+
     // print the display
     if (updateDisplay) {
       // clear the update flag
@@ -912,6 +914,8 @@ void page_Oximeter(void) {
     if (updateDynamicSection) {
       updateDynamicSection = false;
       // Display SpO2
+
+
 
       display.setCursor(10, 20);
       display.print("SpO2: ");

@@ -22,6 +22,8 @@
 #include <Wireling.h> // Interface with Wirelings
 #include "pitches.h"
 
+#include <MAX30101.h>
+
 /* Menu Definitions */
 #define ROOT_MENU_COUNT 3
 #define SUB_MENU1_COUNT 4
@@ -82,6 +84,10 @@ RTCZero rtc;
 #elif defined(ARDUINO_ARCH_SAMD)
 #define SerialMonitorInterface SerialUSB
 #endif
+
+
+MAX30101 pulseSensor = MAX30101();
+int pulseSensorPort = 2;
 
 // =========================================================================
 // ||                          VARIABLES - WIFI & MQTT                      ||
@@ -212,6 +218,16 @@ void setup() {
   // init the serial port to be used as a display return
   Wire.begin();
   Wireling.begin();
+
+  while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
+
+  Wireling.selectPort(pulseSensorPort);
+  if (pulseSensor.begin()) {
+    while (true) {
+      SerialMonitorInterface.println("MAX30101 Wireling not detected!");
+      delay(1000);
+    }
+  }
 
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {

@@ -3,6 +3,9 @@
 #include <SD.h>
 #include <AudioZero.h>
 
+
+
+
 // =========================================================================
 // ||                          FUNCTION - AUDIO                            || 
 // ========================================================================= 
@@ -79,32 +82,52 @@ void displayTime() {
 // ========================================================================= 
 void getPulseAndBuzzer(void) {
 
-  const int pin = A0; // A0 for port 0 on Wireling Adapter, A1 for port 1, etc.
+  // const int pin = A0; // A0 for port 0 on Wireling Adapter, A1 for port 1, etc.
 
-  // Notes in the melody for a longer song:
-  int melody[] = {
-    NOTE_E4, NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4,
-    NOTE_C4, NOTE_C4, NOTE_D4, NOTE_E4, NOTE_E4, NOTE_D4, NOTE_D4, NOTE_E4,
-    NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4, NOTE_C4,
-    NOTE_C4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_C4
-  };
+  // // Notes in the melody for a longer song:
+  // int melody[] = {
+  //   NOTE_E4, NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4,
+  //   NOTE_C4, NOTE_C4, NOTE_D4, NOTE_E4, NOTE_E4, NOTE_D4, NOTE_D4, NOTE_E4,
+  //   NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4, NOTE_C4,
+  //   NOTE_C4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_C4
+  // };
 
-  // Note durations for the longer song: 4 = quarter note, 8 = eighth note, etc.
-  int noteDurations[] = {
-    4, 4, 4, 4, 4, 4, 4, 4,
-    4, 4, 4, 4, 4, 4, 4, 4,
-    4, 4, 4, 4, 4, 4, 4, 4,
-    4, 4, 4, 4, 4, 4
-  };
+  // // Note durations for the longer song: 4 = quarter note, 8 = eighth note, etc.
+  // int noteDurations[] = {
+  //   4, 4, 4, 4, 4, 4, 4, 4,
+  //   4, 4, 4, 4, 4, 4, 4, 4,
+  //   4, 4, 4, 4, 4, 4, 4, 4,
+  //   4, 4, 4, 4, 4, 4
+  // };
 
-   // Iterate over the notes of the melody and play them in a loop:
-  for (int thisNote = 0; thisNote < 30; thisNote++) {
-    int noteDuration = 1000 / noteDurations[thisNote];
-    tone(pin, melody[thisNote], noteDuration);
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    noTone(pin); // Stop the tone playing
+  //  // Iterate over the notes of the melody and play them in a loop:
+  // for (int thisNote = 0; thisNote < 30; thisNote++) {
+  //   int noteDuration = 1000 / noteDurations[thisNote];
+  //   tone(pin, melody[thisNote], noteDuration);
+  //   int pauseBetweenNotes = noteDuration * 1.30;
+  //   delay(pauseBetweenNotes);
+  //   noTone(pin); // Stop the tone playing
+  // }
+
+  SerialMonitorInterface.print("i am in oxi");
+
+  Wireling.selectPort(pulseSensorPort);
+  if (pulseSensor.update()) {
+    if (pulseSensor.pulseValid()) {
+      SerialMonitorInterface.print(pulseSensor.temperature());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.print(pulseSensor.BPM());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.print(pulseSensor.oxygen());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.println(pulseSensor.cardiogram() * 10.0);
+    } else {
+      SerialMonitorInterface.print(pulseSensor.temperature());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.println("-\t-\t-");
+    }
   }
+  delay(20);//Polling the sensor too often can cause extra noise. The sensor can buffer about 300ms of data with the default settings.
 
 
 }
