@@ -219,12 +219,12 @@ void page_SubMenu2(void) {
 
     if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
       switch (sub_Pos) {
-        case 1: currPage = ATTENDANCE_SCREEN; return;
+        case 1: currPage = OXIMETER_SCREEN; return;
         case 2: currPage = ALARM_SCREEN; return;
         case 3: currPage = SILENTHELPER_SCREEN;return;
         case 4: currPage = AUDIO_SCREEN; return;
         case 5: currPage = GAME_SCREEN; return;
-        case 6: currPage = OXIMETER_SCREEN; return;
+        case 6: currPage = ATTENDANCE_SCREEN; return;
       }
     }
 

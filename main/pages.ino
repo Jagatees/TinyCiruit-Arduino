@@ -867,6 +867,8 @@ void page_Alarm(void) {
 // ||                      PAGE - OXIMETER PAGE                           ||
 // =========================================================================
 void page_Oximeter(void) {
+
+
   // flag for updating the display
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
@@ -929,7 +931,6 @@ void page_Oximeter(void) {
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      getAudio();
       updateDynamicSection = true;
       btn_Down_WasDown = false;
     }
