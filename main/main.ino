@@ -123,23 +123,6 @@ int alarmHour = 0;
 int alarmMinute = 0;
 bool alarmSet = false;
 
-const int pin = A0; // A0 for port 0 on Wireling Adapter, A1 for port 1, etc
-
-// Notes in the melody for a longer song:
-int melody[] = {
-  NOTE_E4, NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4,
-  NOTE_C4, NOTE_C4, NOTE_D4, NOTE_E4, NOTE_E4, NOTE_D4, NOTE_D4, NOTE_E4,
-  NOTE_E4, NOTE_F4, NOTE_G4, NOTE_G4, NOTE_F4, NOTE_E4, NOTE_D4, NOTE_C4,
-  NOTE_C4, NOTE_D4, NOTE_E4, NOTE_D4, NOTE_C4
-};
-
-// Note durations for the longer song: 4 = quarter note, 8 = eighth note, etc.
-int noteDurations[] = {
-  4, 4, 4, 4, 4, 4, 4, 4,
-  4, 4, 4, 4, 4, 4, 4, 4,
-  4, 4, 4, 4, 4, 4, 4, 4,
-  4, 4, 4, 4, 4, 4
-};
 
 
 // =========================================================================
@@ -228,6 +211,8 @@ void setup() {
 
   // init the serial port to be used as a display return
   Wire.begin();
+  Wireling.begin();
+
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -276,14 +261,7 @@ void setup() {
   display.setFlip(true);
 
 
-  Wireling.begin();
-  for (int thisNote = 0; thisNote < 30; thisNote++) {
-    int noteDuration = 1000 / noteDurations[thisNote];
-    tone(pin, melody[thisNote], noteDuration);
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    noTone(pin); // Stop the tone playing
-  }
+
 
   //dictionary.add("Weather/Response", "Rainy,25,30,20");
   //dictionary.add("Announcement/Prof/Topic", "How are you today?");
@@ -297,7 +275,7 @@ void loop() {
 
   // This new to be running as often as possiable
   // put your main code here, to run repeatedly:
-  //client.loop();
+  client.loop();
 
   /* check and compare rtc time to set alarm */
   /*
@@ -309,32 +287,32 @@ void loop() {
 
   */
 
-  // if (currPage == LOCK_SCREEN) {
-  //   // start tracking the milliseconds
-  //   page_LockScreen();
-  // } else {
-  //   switch (currPage) {
-  //     case LOCK_SCREEN: page_LockScreen(); break;
-  //     case ROOT_MENU: page_RootMenu(); break;
-  //     case SUB_MENU1: page_SubMenu1(); break;
-  //     case SUB_MENU2: page_SubMenu2(); break;
-  //     case SUB_MENU3: page_SubMenu3(); break;
-  //     case WEATHER_SCREEN: page_Weather(); break;
-  //     case TEST_SCREEN: page_Test(); break;
-  //     //case GRAPH_SCREEN: page_Graph(); break;
-  //     case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
-  //     case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
-  //     case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
-  //     case ALARM_SCREEN: page_Alarm(); break;
-  //     //case ATTENDANCE_SCREEN: page_Attendance(); break;
-  //     case OPENAI_SCREEN: page_OpenAI(); break;
-  //     case SILENTHELPER_SCREEN: page_SilentHelper(); break;
-  //     case AUDIO_SCREEN: page_Audio(); break;
-  //     case GAME_SCREEN: page_Game(); break;
-  //     case OXIMETER_SCREEN: page_Oximeter(); break;
-  //     //case TELEBOT_SCREEN: page_Telebot(); break;
-  //   }
-  // }
+  if (currPage == LOCK_SCREEN) {
+    // start tracking the milliseconds
+    page_LockScreen();
+  } else {
+    switch (currPage) {
+      case LOCK_SCREEN: page_LockScreen(); break;
+      case ROOT_MENU: page_RootMenu(); break;
+      case SUB_MENU1: page_SubMenu1(); break;
+      case SUB_MENU2: page_SubMenu2(); break;
+      case SUB_MENU3: page_SubMenu3(); break;
+      case WEATHER_SCREEN: page_Weather(); break;
+      case TEST_SCREEN: page_Test(); break;
+      //case GRAPH_SCREEN: page_Graph(); break;
+      case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
+      case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
+      case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
+      case ALARM_SCREEN: page_Alarm(); break;
+      //case ATTENDANCE_SCREEN: page_Attendance(); break;
+      case OPENAI_SCREEN: page_OpenAI(); break;
+      case SILENTHELPER_SCREEN: page_SilentHelper(); break;
+      case AUDIO_SCREEN: page_Audio(); break;
+      case GAME_SCREEN: page_Game(); break;
+      case OXIMETER_SCREEN: page_Oximeter(); break;
+      //case TELEBOT_SCREEN: page_Telebot(); break;
+    }
+  }
 }
 
 // =========================================================================
