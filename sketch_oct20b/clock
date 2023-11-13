@@ -1,12 +1,11 @@
-// alarm and homescreen clock code
-// still lacking ht's buzzer code for alarm & need to get time set by user from vanessa for void loop
-
 #include <TinyScreen.h> //include TinyScreen library
 #include <TimeLib.h> //include the Arduino Time library
 #include <RTCZero.h> //include the Arduino Zero's Real Time Clock library
 #include <stdio.h>  // include the C++ standard IO library
 #include <Wire.h>
 #include <GraphicsBuffer.h>
+#include <Wireling.h>
+#include "pitches.h"
 /* Create an rtc object */
 RTCZero rtc;
 
@@ -27,6 +26,17 @@ int brightness = 15; // We'll set it, 3 - 15 based on time of day
 //TinyScreen display = TinyScreen(TinyScreenPlus); //Create the TinyScreen object
 TinyScreen display = TinyScreen(0);
 GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
+const int pin = A0; // A0 for port 0 on Wireling Adapter, A1 for port 1, etc.
+
+// Notes in the new melody for a different notification:
+int melody[] = {
+  NOTE_D5, NOTE_E5, NOTE_G5, NOTE_D6
+};
+
+// Note durations for the new melody: 4 = quarter note, 8 = eighth note, etc.:
+int noteDurations[] = {
+  4, 8, 4, 2
+};
 
 void setup()
 {
@@ -35,7 +45,7 @@ void setup()
   static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
   Wire.begin();
   display.begin();
-  
+  Wireling.begin();
   display.setBrightness(10);
   display.setFlip(true);
   //display.begin();                            //Initializes TinyScreen board
@@ -222,9 +232,21 @@ void displayTime()
     drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, TS_8b_Black);
   }
 }
+void playNotificationMelody() {
+  for (int thisNote = 0; thisNote < 4; thisNote++) {
+    int noteDuration = 1000 / noteDurations[thisNote];
+    tone(pin, melody[thisNote], noteDuration);
+
+    int pauseBetweenNotes = noteDuration * 1.30;
+    delay(pauseBetweenNotes);
+    noTone(pin); // Use 'pin' instead of 8 to stop the tone.
+  }
+}
+
 bool isOn = true;
 void alarmClock(){
   while (display.getButtons()==0){
+  playNotificationMelody();
   display.setFont(liberationSans_16ptFontInfo);
   display.setBrightness(10);
   display.setFlip(true);
@@ -238,13 +260,13 @@ void alarmClock(){
   }
   isOn = !isOn;
 
-  delay(700); // Adjust the delay to control the blinking rate
+  delay(300); // Adjust the delay to control the blinking rate
 } display.clearScreen();
 displayTime();}
 
 void loop()
 {
   display.on();
-  // if the time set in other file is == to rtc, then run alarmClock function, else run displayTime()
+  // if the time set in other file is == to rtc, then run alarmClock function, else run normal
   alarmClock();
 }
