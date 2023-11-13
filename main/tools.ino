@@ -127,13 +127,25 @@ void downArrow(int x, int y) {
 // =========================================================================
 // ||                          ALARM DISPLAY                              ||
 // =========================================================================
+unsigned long lastBlinkMillis = 0;
+const unsigned long blinkInterval = 2000;  // Blink every 1000 milliseconds (1 second)
+bool isOn = false;
 void display_Alarm_Notif(int hour, int minute) {
-  display.clearWindow(20, 45, 50, 16);
+  SerialMonitorInterface.println("Entered function");
+
+  // start the display
+  display.begin();
 
   hours = rtc.getHours();
   minutes = rtc.getMinutes();
   
+  SerialMonitorInterface.println(hours);
+  SerialMonitorInterface.println(minutes);
+
+  unsigned long currentMillis = millis();
+
   if (hour == hours && minute == minutes) {
+    display.clearWindow(20, 45, 50, 16);
     SerialMonitorInterface.println("Correct Time");
     display.setFont(liberationSans_16ptFontInfo);
     display.setBrightness(10);
@@ -141,6 +153,42 @@ void display_Alarm_Notif(int hour, int minute) {
     display.fontColor(TS_8b_White, TS_8b_Red);
     display.setCursor(5, 20);
     display.print("Wake up!!");
+    //page_displayAlarm();
+    /*if (isOn) {
+      display.off();
+    } else {
+      display.on();
+    }
+      //isOn = !isOn;*/
+  } else {
+    display.clearScreen();
+    switch_page();
   }
-  delay(700); // Adjust the delay to control the blinking rate
 } 
+
+// =========================================================================
+// ||                          SWITCH PAGES                              ||
+// =========================================================================
+void switch_page(void) {
+  switch (currPage) {
+    case LOCK_SCREEN: page_LockScreen(); break;
+    case ROOT_MENU: page_RootMenu(); break;
+    case SUB_MENU1: page_SubMenu1(); break;
+    case SUB_MENU2: page_SubMenu2(); break;
+    case SUB_MENU3: page_SubMenu3(); break;
+    case WEATHER_SCREEN: page_Weather(); break;
+    case TEST_SCREEN: page_Test(); break;
+    //case GRAPH_SCREEN: page_Graph(); break;
+    case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
+    case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
+    case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
+    case ALARM_SCREEN: page_Alarm(); break;
+    //case ATTENDANCE_SCREEN: page_Attendance(); break;
+    case OPENAI_SCREEN: page_OpenAI(); break;
+    case SILENTHELPER_SCREEN: page_SilentHelper(); break;
+    case AUDIO_SCREEN: page_Audio(); break;
+    case GAME_SCREEN: page_Game(); break;
+    case OXIMETER_SCREEN: page_Oximeter(); break;
+    //case TELEBOT_SCREEN: page_Telebot(); break;
+  }
+}

@@ -56,12 +56,13 @@ enum pageType {
   SILENTHELPER_SCREEN,
   AUDIO_SCREEN,
   GAME_SCREEN,
-  OXIMETER_SCREEN
+  OXIMETER_SCREEN,
+  DISPLAY_ALARM_SCREEN
   //TELEBOT_SCREEN
 };
 
 // holds which page is currently selected
-enum pageType currPage = OXIMETER_SCREEN;
+enum pageType currPage = LOCK_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -221,13 +222,13 @@ void setup() {
 
   while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
 
-  Wireling.selectPort(pulseSensorPort);
+  /*Wireling.selectPort(pulseSensorPort);
   if (pulseSensor.begin()) {
     while (true) {
       SerialMonitorInterface.println("MAX30101 Wireling not detected!");
       delay(1000);
     }
-  }
+  }*/
 
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {
@@ -276,32 +277,16 @@ void setup() {
   display.setBrightness(10);
   display.setFlip(true);
 
-
-
-
-  //dictionary.add("Weather/Response", "Rainy,25,30,20");
-  //dictionary.add("Announcement/Prof/Topic", "How are you today?");
-  //dictionary.add("Announcement/Prof/OpenAI", "I am fine.");
 } 
 
 // ========================================================================
 // ||                             MAIN LOOP                              ||
 // ========================================================================
+
+  // Check and compare rtc time to set alarm at a specific interval
+  /**/
+
 void loop() {
-
-  // This new to be running as often as possiable
-  // put your main code here, to run repeatedly:
-  client.loop();
-
-  /* check and compare rtc time to set alarm */
-  /*
-    while (true) {
-      if (setAlarm) {
-        // when comparison is correct, buzzer = on;
-      }
-    }
-
-  */
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -347,6 +332,7 @@ void page_LockScreen(void) {
 
   // selected item pointer
   uint8_t sub_Pos = 1;
+
   // inner loop
   while (true) {
     loopStartMs = millis();
@@ -428,6 +414,7 @@ void page_RootMenu(void) {
 
   // flag for updating the display
   boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
 
   // tracks when entered top of loop
   uint32_t loopStartMs;
@@ -465,6 +452,14 @@ void page_RootMenu(void) {
       // print a divider line
       printDivider();
 
+
+
+      // print a divider line
+      display.setCursor(0, 50);
+      printDivider();
+    }
+
+    if (updateDynamicSection) {
       // print the items
       display.setCursor(0, 10);
       printSelected(1, root_Pos);
@@ -477,11 +472,8 @@ void page_RootMenu(void) {
       display.setCursor(0, 30);
       printSelected(3, root_Pos);
       display.print("Sub Menu Three");
-
-      // print a divider line
-      display.setCursor(0, 50);
-      printDivider();
     }
+
     // capture button down states
     if (btnIsDown(BTN_UP)) { btn_Up_WasDown = true; }
     if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
@@ -495,7 +487,7 @@ void page_RootMenu(void) {
       } else {
         root_Pos++;
       }
-      updateDisplay = true;
+      updateDynamicSection = true;
       btn_Down_WasDown = false;
     }
 
@@ -506,7 +498,7 @@ void page_RootMenu(void) {
       } else {
         root_Pos--;
       }
-      updateDisplay = true;
+      updateDynamicSection = true;
       btn_Up_WasDown = false;
     }
 

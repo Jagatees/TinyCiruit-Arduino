@@ -3,29 +3,25 @@
 // =========================================================================
 void page_Weather(void) {
   // flag for updating the display
-  boolean updateDisplay = true;
-  boolean updateDynamicSection = true;
+  static boolean updateDisplay = true;
+  static boolean updateDynamicSection = true;
 
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
   //tracks button states
-  boolean btn_Up_WasDown = false;
-  boolean btn_Down_WasDown = false;
-  boolean btn_Cancel_WasDown = false;
+  static boolean btn_Up_WasDown = false;
+  static boolean btn_Down_WasDown = false;
+  static boolean btn_Cancel_WasDown = false;
 
-  int counter = 0;
   // selected item pointer
-  uint8_t sub_Pos = 1;
+  static uint8_t sub_Pos = 1;
 
-  String result;
-  String temperature;
-  String temperature_min;
-  String temperature_max;
-  String weather_condition;
-
-  // inner loop
-  while (true) {
+  static String result;
+  static String temperature;
+  static String temperature_min;
+  static String temperature_max;
+  static String weather_condition;
 
     loopStartMs = millis();
 
@@ -43,8 +39,6 @@ void page_Weather(void) {
       temperature_max = result.substring(secondComma + 1, thirdComma);
       temperature_min = result.substring(thirdComma + 1);
     }
-
-    updateDynamicSection = true;
 
     // print the display
     if (updateDisplay) {
@@ -127,7 +121,11 @@ void page_Weather(void) {
     }
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
-  }
+  // inner loop
+  /*while (true) {
+
+
+  }*/
 }
 // =========================================================================
 // ||                          PAGE - TEST PAGE                           ||
@@ -761,6 +759,10 @@ void page_Audio(void) {
 // =========================================================================
 // ||                         PAGE - ALARM PAGE                           ||
 // =========================================================================
+int oldMinutes = 0;
+unsigned long previousMillis = 0;
+const long interval = 1000;  // Set the interval in milliseconds (adjust as needed)
+
 void set_alarm(int hour, int minute) {
   alarmHour = hour;
   alarmMinute = minute;
@@ -768,7 +770,29 @@ void set_alarm(int hour, int minute) {
   
   SerialMonitorInterface.print(alarmHour);
   SerialMonitorInterface.print(alarmMinute);
+}
 
+bool check_alarm(void) {
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    minutes = rtc.getMinutes();
+    SerialMonitorInterface.println("Minutes have changed");
+    SerialMonitorInterface.println(minutes);
+
+    if (minutes != oldMinutes) {
+      oldMinutes = minutes;
+      // Check and compare rtc time to set alarm
+      if (true) { // Adjust the condition based on your requirements
+        SerialMonitorInterface.println("Entered alarmSet");
+        // When comparison is correct, turn on the buzzer or run alarm code
+        return true;
+      }
+    } else {
+      return false;
+    }
+  }
 }
 
 void page_Alarm(void) {
@@ -787,9 +811,15 @@ void page_Alarm(void) {
 
   int setHour = 0;
   int setMinute = 0;
+
+  bool isOn = true;
+
   // inner loop
   while (true) {
+    
     loopStartMs = millis();
+    hours = rtc.getHours();
+    minutes = rtc.getMinutes();
 
     // print the display
     if (updateDisplay) {
@@ -818,12 +848,36 @@ void page_Alarm(void) {
       display.setCursor(24, 20);
       display.print("HH : MM");
       // Display current input
-      display.setCursor(24, 40);
+      display.setCursor(24, 30);
       display.print(setHour);
 
       display.print(" : ");
 
       display.print(setMinute);
+
+      if (hours == alarmHour && minutes == alarmMinute && alarmSet == true) { //
+          //if (!isOn) { isOn = true; }
+          //display.clearWindow(20, 45, 50, 16);
+          SerialMonitorInterface.println("Correct Time");
+          SerialMonitorInterface.println(isOn);
+          //display.setCursor(24, 50);
+          //display.print("Wake up!!");
+
+          if (isOn) {
+            display.setBrightness(0);
+            delay(500);
+            updateDynamicSection = true;
+          } else {
+            display.setBrightness(20);
+            display.setCursor(24, 50);
+            display.print("Wake up!!");
+            delay(500);
+            updateDynamicSection = true;
+          }
+
+          isOn = !isOn;
+      }
+      
 
     }
     // capture button down states
