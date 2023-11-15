@@ -26,8 +26,8 @@
 
 /* Menu Definitions */
 #define ROOT_MENU_COUNT 3
-#define SUB_MENU1_COUNT 4
-#define SUB_MENU2_COUNT 6
+#define SUB_MENU1_COUNT 5
+#define SUB_MENU2_COUNT 3
 #define SUB_MENU3_COUNT 2
 #define LOCK_SCREEN_DURATION 10000  // 60 secs
 #define BLACK 0x0000                // For 16-bit color displays
@@ -38,27 +38,32 @@ GraphicsBuffer displayBuffer = GraphicsBuffer(96, 64, colorDepth1BPP);
 // use enum to make things more readable and flexible
 // setup the enum with all the menu page options
 enum pageType {
+  // Main
   LOCK_SCREEN,
   ROOT_MENU,
   SUB_MENU1,
   SUB_MENU2,
   SUB_MENU3,
-  WEATHER_SCREEN,
-  TEST_SCREEN,
-  GRAPH_SCREEN,
-  HEART_SCREEN,
+  // Education
   HOOTHOOT_START_SCREEN,
   HOOTHOOT_QUIZ_SCREEN,
   HOOTHOOT_SUBMISSION_SCREEN,
   ATTENDANCE_SCREEN,
-  ALARM_SCREEN,
   OPENAI_SCREEN,
   SILENTHELPER_SCREEN,
+  TELEBOT_SCREEN,
+  // System
+  WEATHER_SCREEN,
+  ALARM_SCREEN,
+  OXIMETER_SCREEN,
+  // Entertainment
   AUDIO_SCREEN,
   GAME_SCREEN,
-  OXIMETER_SCREEN,
+  // Misc
+  TEST_SCREEN,
+  GRAPH_SCREEN,
+  HEART_SCREEN,
   DISPLAY_ALARM_SCREEN
-  //TELEBOT_SCREEN
 };
 
 // holds which page is currently selected
@@ -293,25 +298,34 @@ void loop() {
     page_LockScreen();
   } else {
     switch (currPage) {
+      // Main Screens
       case LOCK_SCREEN: page_LockScreen(); break;
       case ROOT_MENU: page_RootMenu(); break;
       case SUB_MENU1: page_SubMenu1(); break;
       case SUB_MENU2: page_SubMenu2(); break;
       case SUB_MENU3: page_SubMenu3(); break;
-      case WEATHER_SCREEN: page_Weather(); break;
-      case TEST_SCREEN: page_Test(); break;
-      //case GRAPH_SCREEN: page_Graph(); break;
+
+      // Education Screens
       case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
       case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
       case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
-      case ALARM_SCREEN: page_Alarm(); break;
-      //case ATTENDANCE_SCREEN: page_Attendance(); break;
       case OPENAI_SCREEN: page_OpenAI(); break;
       case SILENTHELPER_SCREEN: page_SilentHelper(); break;
+      case ATTENDANCE_SCREEN: page_Attendance(); break;
+      case TELEBOT_SCREEN: page_Telebot(); break;
+
+      // System Screens
+      case WEATHER_SCREEN: page_Weather(); break;
+      case ALARM_SCREEN: page_Alarm(); break;
+      case OXIMETER_SCREEN: page_Oximeter(); break;
+
+      // Entertainment Screens
       case AUDIO_SCREEN: page_Audio(); break;
       case GAME_SCREEN: page_Game(); break;
-      case OXIMETER_SCREEN: page_Oximeter(); break;
-      //case TELEBOT_SCREEN: page_Telebot(); break;
+
+      // Misc
+      case TEST_SCREEN: page_Test(); break;
+      //case GRAPH_SCREEN: page_Graph(); break;
     }
   }
 }
@@ -452,8 +466,6 @@ void page_RootMenu(void) {
       // print a divider line
       printDivider();
 
-
-
       // print a divider line
       display.setCursor(0, 50);
       printDivider();
@@ -463,15 +475,15 @@ void page_RootMenu(void) {
       // print the items
       display.setCursor(0, 10);
       printSelected(1, root_Pos);
-      display.print("APIs Menu");
+      display.print("Education");
 
       display.setCursor(0, 20);
       printSelected(2, root_Pos);
-      display.print("System Apps");
+      display.print("System");
 
       display.setCursor(0, 30);
       printSelected(3, root_Pos);
-      display.print("Sub Menu Three");
+      display.print("Entertainment");
     }
 
     // capture button down states

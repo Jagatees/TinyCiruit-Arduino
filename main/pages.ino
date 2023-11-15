@@ -116,7 +116,7 @@ void page_Weather(void) {
 
     // move to the root menu
     if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
-      currPage = SUB_MENU1;
+      currPage = SUB_MENU2;
       return;
     }
     // keep a specific pace
@@ -596,6 +596,78 @@ void page_OpenAI(void) {
   }
 }
 // =========================================================================
+// ||                          PAGE - ATTENDANCE PAGE                     || 
+// =========================================================================  
+void page_Attendance (void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  String name;
+  //tracks button states
+  boolean btn_Up_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+
+  // selected item pointer
+  uint8_t sub_Pos = 1;
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10); // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0); 
+      display.print("[ ATTENDANCE ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+      // call the weather function and get the returned string
+      // print the items
+      display.setCursor(24, 32);
+      display.print(name); 
+
+    }
+    // capture button down states
+    if (btnIsDown(BTN_UP)) {btn_Up_WasDown = true;}
+    if (btnIsDown(BTN_CANCEL)) {btn_Cancel_WasDown = true;}
+
+    // move the pointer up
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      client.publish("Jake","here");
+      name = "Jake";
+      display.setCursor(0, 42);
+      display.print("Attendance taken!");
+
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+      
+    } 
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) { currPage = SUB_MENU1; return; }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+// =========================================================================
 // ||                  PAGE - SILENTHELPER PAGE                           ||
 // =========================================================================
 void page_SilentHelper(void) {
@@ -670,7 +742,7 @@ void page_SilentHelper(void) {
 
     // move to the root menu
     if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
-      currPage = SUB_MENU2;
+      currPage = SUB_MENU1;
       return;
     }
 
@@ -1047,7 +1119,7 @@ void page_Telebot(void) {
 
       // menu title
       display.setCursor(0, 0);
-      display.print("[ OPENAI ]");
+      display.print("[ TELEBOT ]");
     }
 
     if (updateDynamicSection) {
