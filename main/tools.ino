@@ -127,6 +127,9 @@ void downArrow(int x, int y) {
 // =========================================================================
 // ||                          ALARM DISPLAY                              ||
 // =========================================================================
+// =========================================================================
+// ||                          ALARM DISPLAY                              ||
+// =========================================================================
 unsigned long lastBlinkMillis = 0;
 const unsigned long blinkInterval = 2000;  // Blink every 1000 milliseconds (1 second)
 bool isOn = false;
@@ -165,6 +168,157 @@ void display_Alarm_Notif(int hour, int minute) {
     switch_page();
   }
 } 
+
+void drawCircle(int x0, int y0, int radius, uint8_t color)
+{
+  int x = radius;
+  int y = 0;
+  int radiusError = 1-x;
+ 
+  while(x >= y)
+  {
+    //drawPixel(x,y,color);//set pixel (x,y) to specified color. This is slow because we need to send commands setting the x and y, then send the pixel data.
+    display.drawPixel(x + x0, y + y0, color);
+    display.drawPixel(y + x0, x + y0, color);
+    display.drawPixel(-x + x0, y + y0, color);
+    display.drawPixel(-y + x0, x + y0, color);
+    display.drawPixel(-x + x0, -y + y0, color);
+    display.drawPixel(-y + x0, -x + y0, color);
+    display.drawPixel(x + x0, -y + y0, color);
+    display.drawPixel(y + x0, -x + y0, color);
+    y++;
+    if (radiusError<0)
+    {
+      radiusError += 2 * y + 1;
+    }
+    else
+    {
+      x--;
+      radiusError += 2 * (y - x) + 1;
+    }
+  }
+}
+
+void drawHand(int xStart, int yStart, int angle, int radius, unsigned char color)
+
+{
+  static int sine[16] = {0, 27, 54, 79, 104, 128, 150, 171, 190, 201, 221, 233, 243, 250, 254, 255};
+  int xEnd, yEnd, quadrant, x_flip, y_flip;
+
+  // calculate which quadrant the hand lies in
+  quadrant = angle/15 ;
+
+  switch ( quadrant )
+  {
+    case 0 : x_flip = 1 ; y_flip = -1 ; break ;
+    case 1 : angle = abs(angle-30) ; x_flip = y_flip = 1 ; break ;
+    case 2 : angle = angle-30 ; x_flip = -1 ; y_flip = 1 ; break ;
+    case 3 : angle = abs(angle-60) ; x_flip = y_flip = -1 ; break ; 
+    default:  x_flip = y_flip = 1; // this should not happen
+  }
+
+  xEnd = xStart;
+  yEnd = yStart;
+  xEnd += (x_flip * (( sine[angle] * radius ) >> 8));
+  yEnd += (y_flip * (( sine[15-angle] * radius ) >> 8));
+
+  display.drawLine(xStart, yStart, xEnd, yEnd, color);
+}
+
+void displayClockTime()
+{
+  display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font background
+  display.setFont(thinPixel7_10ptFontInfo);
+  //display.on();                           
+
+ enum
+ {
+    clockCenterX = 55,
+    clockCenterY = 22,
+    clockCircleRadius = 20,
+    clockCircleColor = TS_8b_Red,
+    clockMinuteHandLength = 18,
+    clockMinuteHandColor = TS_8b_White,
+    clockHourHandLength = 8,
+    clockHourHandColor = TS_8b_White,
+    clockSecondHandLength = 18,
+    clockSecondHandColor = TS_8b_Yellow
+  };
+
+  drawCircle(clockCenterX, clockCenterY, clockCircleRadius, clockCircleColor);
+  
+  for (int i = 1; i < 15; i++) // Display for 15*1000 milliseconds (15 seconds), update display each second
+  {
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);  
+    months = rtc.getMonth();
+    days = rtc.getDay();
+    years = rtc.getYear();
+    hours = rtc.getHours();
+    minutes = rtc.getMinutes();
+    seconds = rtc.getSeconds();
+    int hourAngle;
+    if (hours >= 12)
+      hourAngle = hours - 12;
+    else
+      hourAngle = hours;
+    hourAngle *= 5;
+    hourAngle += minutes / 12;
+    
+    
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, clockHourHandColor);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, clockMinuteHandColor);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, clockSecondHandColor);
+    
+
+    if (hours <= 12)
+      brightness = hours + 3; // 0 hours = 3 brightness, noon = 15
+    else if (hours >= 18)
+      brightness = (24 - hours) * 2 + 2;  // 23 hours = 4 brightness, 18 hours = 14
+    else
+      brightness = 15; // full brightness all afternoon
+    if (brightness < 3)
+      brightness = 3;
+    if (brightness > 15)
+      brightness = 15;
+    display.setBrightness(brightness);
+    display.setCursor(0,8); //Set the cursor where you want to start printing the date
+    if(months < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(months);
+    display.print("/");
+    days = rtc.getDay();
+    if (days < 10) display.print(0);
+    display.print(days); 
+    // display.print("/");
+    // display.print(years);
+
+    display.setCursor(0,25); //Set the cursor where you want to start printing the date  
+    setTime(hours,minutes,seconds,days,months,2000 +  years);    //values in the order hr,min,sec,day,month,year
+    char wkday[16];
+    strcpy(wkday, dayStr(weekday()));
+    wkday[3] = ' '; wkday[4] = '\0';
+    display.print(wkday); // To keep the text compact, only print the first 3 letters.
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);   //Set the font type
+
+    // display time in HH:MM:SS 24 hour format
+    display.setCursor(0,45); //Set the cursor where you want to start printing the time
+    if(hours < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(hours);
+    display.print(":");
+    if(minutes < 10) display.print(0); //print a leading 0 if minute value is less than 0
+    display.print(minutes);
+   
+    delay(1000); //display for 1 seconds
+    
+    // Now erase the clock hands by drawing them in black.
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, TS_8b_Black);
+  }
+
+
+}
 
 // =========================================================================
 // ||                          SWITCH PAGES                              ||
