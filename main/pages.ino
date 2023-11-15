@@ -1344,9 +1344,83 @@ void updateDisplay(){
   display.endTransfer();
 }
 
-void page_Game(void) {
-  bool passedThrough = false;
+void restartGame(void) {
+  // Reset game variables
+  score = 0;
+  flappyBirdY = 20; // Set initial position of the bird
+  pipeOffsetX = 128; // Reset pipe position
+  framecount = 0;
+  passedThrough = false;
+}
 
+
+void game_Over(int score) {
+    // flag for updating the display
+  boolean updateDisplay = true;
+
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Accept_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(24, 24);
+      display.print("GAME OVER");
+
+      display.setCursor(24, 34);
+      display.print("Score: "); display.print(score);
+
+      display.setCursor(24, 44);
+      display.print("<- retry");
+
+    }
+
+
+    // capture button down states
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
+      restartGame();
+      currPage = GAME_SCREEN; return;
+      btn_Accept_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU3;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+void page_Game(void) {
+  
   while (true) {
   updateDisplay();
   
@@ -1370,7 +1444,7 @@ void page_Game(void) {
       // Check for collision with the pillars
       if (flappyBirdY < PipeHeight[1] || flappyBirdY + flappyBirdHeight > PipeHeight[1] + pipeSpacingY) {
         pipeColor = RED;
-        currPage = SUB_MENU2; 
+        game_Over(score);
         break;
       }
     } else {
@@ -1385,7 +1459,9 @@ void page_Game(void) {
     flappyBirdY-=(birdYmod*2);
     if(flappyBirdY<0)
       flappyBirdY=0;
+
   }else{							// normal flap, move bird down
+
     wingPos=(framecount>>2)%3;
     flappyBirdY+=birdYmod;
     if(flappyBirdY>40)
@@ -1436,7 +1512,7 @@ void page_Game(void) {
 
   // move to the root menu
   if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
-    currPage = SUB_MENU1;
+    currPage = SUB_MENU3;
     return;
   }
 
