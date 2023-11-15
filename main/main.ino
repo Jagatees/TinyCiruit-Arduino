@@ -67,7 +67,7 @@ enum pageType {
 };
 
 // holds which page is currently selected
-enum pageType currPage = OXIMETER_SCREEN;
+enum pageType currPage = ROOT_MENU;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -224,17 +224,17 @@ void setup() {
 
   // init the serial port to be used as a display return
   Wire.begin();
-  Wireling.begin();
+  //Wireling.begin();
 
-  while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
+  // while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
 
-  Wireling.selectPort(pulseSensorPort);
-  if (pulseSensor.begin()) {
-    while (true) {
-      SerialMonitorInterface.println("MAX30101 Wireling not detected!");
-      delay(1000);
-    }
-  }
+  // Wireling.selectPort(pulseSensorPort);
+  // if (pulseSensor.begin()) {
+  //   while (true) {
+  //     SerialMonitorInterface.println("MAX30101 Wireling not detected!");
+  //     delay(1000);
+  //   }
+  // }
 
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {
@@ -283,7 +283,7 @@ void setup() {
   display.setBrightness(10);
   display.setFlip(true);
 
-  SerialMonitorInterface.println("The Watching Video");
+  SerialMonitorInterface.println("The Watch is Ready to use");
 } 
 
 // ========================================================================
@@ -707,7 +707,9 @@ void initMQTT() {
     delay(5000);
   }
 
-  // Subscribe to a topic
+
+  // client.subscribe()
+  // client.publish()
 
   // HootHoot Quiz
   client.subscribe("HootHoot/Start");
@@ -719,11 +721,21 @@ void initMQTT() {
   client.subscribe("HootHoot/Question1/Option2");
   SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
-  client.subscribe("HootHoot/ProfAnswer");
+  client.subscribe("HootHoot/Question1/ProfAnswer");
   SerialMonitorInterface.println("HootHoot/ProfAnswer");
+  
+  client.subscribe("tele/Announcement");
+  SerialMonitorInterface.println("tele/Announcement");
 
-  client.subscribe("Announcement");
-  SerialMonitorInterface.println("Announcement");
+  client.subscribe("tele/Jake");
+  SerialMonitorInterface.println("tele/Jake");
+
+  client.subscribe("Weather/Response");
+  SerialMonitorInterface.println("Weather/Response");
+
+  client.subscribe("tele/SuggestedResponse");
+  SerialMonitorInterface.println("tele/SuggestedResponse");
+  
 
 }
 

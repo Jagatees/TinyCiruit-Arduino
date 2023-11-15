@@ -3,26 +3,27 @@
 // =========================================================================
 void page_Weather(void) {
   // flag for updating the display
-  static boolean updateDisplay = true;
-  static boolean updateDynamicSection = true;
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
 
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
   //tracks button states
-  static boolean btn_Up_WasDown = false;
-  static boolean btn_Down_WasDown = false;
-  static boolean btn_Cancel_WasDown = false;
+  boolean btn_Up_WasDown = false;
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
 
   // selected item pointer
-  static uint8_t sub_Pos = 1;
+  uint8_t sub_Pos = 1;
 
-  static String result;
-  static String temperature;
-  static String temperature_min;
-  static String temperature_max;
-  static String weather_condition;
+  String result;
+  String temperature;
+  String temperature_min;
+  String temperature_max;
+  String weather_condition;
 
+  while(true){
     loopStartMs = millis();
 
     client.loop();
@@ -121,6 +122,7 @@ void page_Weather(void) {
     }
     // keep a specific pace
     while (millis() - loopStartMs < 25) { delay(2); }
+  }
   // inner loop
   /*while (true) {
 
@@ -317,7 +319,7 @@ void page_HootHootQuiz(void) {
   // flag for updating the display
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
-
+  boolean responseSent = false;
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
@@ -374,13 +376,7 @@ void page_HootHootQuiz(void) {
       display.setCursor(0, 32);
       if (user_input != "") {
 
-        if (user_input == "A") {
-          client.publish("HootHoot/Answer", "A");
-        }
-
-        if (user_input == "B") {
-          client.publish("HootHoot/Answer", "B");
-        }
+      
       }
 
       display.setCursor(24, 45);
@@ -399,16 +395,33 @@ void page_HootHootQuiz(void) {
       user_input = result2;
       updateDynamicSection = true;
       btn_Down_WasDown = false;
-      currPage = HOOTHOOT_SUBMISSION_SCREEN;
-      break;
+      if (user_input == "B") {
+          client.publish("HootHoot/Answer", "B");
+                responseSent = true;
+
+        }
+      if (responseSent) {
+        currPage = HOOTHOOT_SUBMISSION_SCREEN;
+        return;
+      }
+  
     }
     // move to the root menu
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
       user_input = result1;
       updateDynamicSection = true;
       btn_Up_WasDown = false;
+
+        if (user_input == "A") {
+          client.publish("HootHoot/Answer", "A");
+                responseSent = true;
+        }
+
+      if (responseSent) {
       currPage = HOOTHOOT_SUBMISSION_SCREEN;
-      break;
+      return;
+      }
+
     }
 
     // keep a specific pace
@@ -436,7 +449,7 @@ void page_HootHootSubmission(void) {
     loopStartMs = millis();
 
     client.loop();
-    String result = dictionary.get("HootHoot/ProfAnswer");
+    String result = dictionary.get("HootHoot/Question1/ProfAnswer");
 
     // print the display
     if (updateDisplay) {
@@ -650,7 +663,7 @@ void page_Attendance (void) {
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      client.publish("Jake","here");
+      client.publish("Attendance","Jake");
       name = "Jake";
       display.setCursor(0, 42);
       display.print("Attendance taken!");
@@ -721,7 +734,7 @@ void page_SilentHelper(void) {
       display.print("Press down button");
 
       if (sentResponse) {
-        client.publish("SlientHelper/Asker" , "StudentName");
+        client.publish("Studenthelp" , "Jake");
         display.setCursor(0, 42);
         display.print("Response sent!");
       }
@@ -1104,16 +1117,24 @@ void page_Telebot(void) {
   boolean updateDisplay = true;
   boolean updateDynamicSection = true;
   boolean sentResponse = false;
-
+  boolean readyToStart = false;
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
   //tracks button states
+  boolean btn_Up_WasDown = false;
   boolean btn_Down_WasDown = false;
   boolean btn_Cancel_WasDown = false;
+  boolean btn_Accept_WasDown = false;
 
-  String prof_result;
-  String openai_result;
+  String tele_announcement;
+  String tele_jake;
+  String result;
+
+  String firstResponse;
+  String secondResponse;
+  String thirdResponse;
+  String fourthResponse;
 
   // inner loop
   while (true) {
@@ -1121,9 +1142,31 @@ void page_Telebot(void) {
 
     client.loop();
 
-    prof_result = dictionary.get("Announcement/Prof/Topic");
-    openai_result = dictionary.get("Announcement/Prof/OpenAI");
+    if (dictionary.get("tele/Announcement") != "") {
+      tele_announcement = dictionary.get("tele/Announcement");
 
+   if (dictionary.get("tele/SuggestedResponse") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
+      result = dictionary.get("tele/SuggestedResponse");
+
+      int firstComma = result.indexOf(',');
+      int secondComma = result.indexOf(',', firstComma + 1);
+      int thirdComma = result.indexOf(',', secondComma + 1);
+
+      firstResponse = result.substring(0, firstComma);
+      secondResponse = result.substring(firstComma + 1, secondComma);
+      thirdResponse = result.substring(secondComma + 1, thirdComma);
+      fourthResponse = result.substring(thirdComma + 1);
+
+      readyToStart = true;
+    } else {
+display.print("No data Yet");
+    }
+    } else {
+      display.print("No data Yet");
+    }
+    
+    tele_jake = dictionary.get("tele/Jake");
+    
     // print the display
     if (updateDisplay) {
       // clear the update flag
@@ -1145,10 +1188,22 @@ void page_Telebot(void) {
 
     if (updateDynamicSection) {
       updateDynamicSection = false;
+      display.setCursor(10,22);
+      display.print(tele_announcement);
 
-      if (prof_result != "") {
+      display.setCursor(64, 22);
+      display.print(firstResponse);
+
+      display.setCursor(24, 45);
+      display.print(secondResponse);
+
+      display.setCursor(64, 45);
+      display.print(thirdResponse);
+
+
+      /*if (tele_annoucement != "") {
         display.setCursor(0, 22);
-        display.print(prof_result);
+        display.print(tele_annoucement);
       }
 
       display.setCursor(0, 32); 
@@ -1159,19 +1214,35 @@ void page_Telebot(void) {
           display.print("Response sent!");
         }
 
-      }
+      }*/
       // 2 buttons, one to respond with openAI_result, one go back to main menu
     }
 
     // capture button down states
+    if (btnIsDown(BTN_UP)) { btn_Up_WasDown = true; }
     if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
     if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
       sentResponse = true;
       updateDynamicSection = true;
       btn_Down_WasDown = false;
+    }
+
+        // move the pointer up
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      sentResponse = true;
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+    }
+
+        // move the pointer up
+    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
+      sentResponse = true;
+      updateDynamicSection = true;
+      btn_Accept_WasDown = false;
     }
 
     // move to the root menu
@@ -1200,7 +1271,6 @@ void page_GoogleCalendar(void) {
 
   String today_event;
   String today_date;
-  String today_event;
 
   // inner loop
   while (true) {
@@ -1245,7 +1315,7 @@ void page_GoogleCalendar(void) {
       updateDynamicSection = false;
 
       if (today_event != "") {
-        display.print("")
+        display.print("");
       } else {
         display.print("No Events today");
       }

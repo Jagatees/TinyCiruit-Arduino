@@ -210,7 +210,10 @@ void page_SubMenu2(void) {
     if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
       switch (sub_Pos) {
         case 1: currPage = ALARM_SCREEN; return;
-        case 2: currPage = WEATHER_SCREEN; return;
+        case 2: 
+        client.publish("Weather/Request", "True");
+        currPage = WEATHER_SCREEN; 
+        return;
         case 3: currPage = OXIMETER_SCREEN; return;
       }
     }
