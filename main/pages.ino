@@ -1059,17 +1059,18 @@ void page_Oximeter(void) {
       updateDynamicSection = false;
       // Display SpO2
 
-      display.setCursor(10, 20);
-
-      display.print("Oxegen:");
+      display.setCursor(10, 10);
+      display.print("Oxygen:");
       display.print(pulseSensor.oxygen());
 
       // Display heart rate
-      display.setCursor(5, 40);
+      display.setCursor(10, 20);
       display.print("Temp: ");
       display.print(pulseSensor.temperature());
+      display.setCursor(10, 30);
       display.print("BPM");
       display.print(pulseSensor.BPM());
+      display.setCursor(10, 40);
       display.print("Cardiogram");
       display.print(pulseSensor.cardiogram() * 10.0);
 
