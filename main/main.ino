@@ -135,11 +135,12 @@ int alarmHour = 0;
 int alarmMinute = 0;
 bool alarmSet = false;
 
+int clock_brightness = 15;
 
 
 // =========================================================================
 // ||                          c++ - dictionary                           ||
-// =========================================================================
+// ==================================================cl=======================
 const int MAX_SIZE = 256;  // Adjust this as needed.
 
 struct KeyValuePair {
@@ -333,16 +334,18 @@ void loop() {
 // =========================================================================
 // ||                          PAGE - LOCK SCREEN                          ||
 // =========================================================================
-
 void page_LockScreen(void) {
+  static bool isOn = true;
   // flag for updating the display
   boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
 
   // tracks when entered top of loop
   uint32_t loopStartMs;
 
   //tracks button states
   boolean btn_Accept_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
 
   // selected item pointer
   uint8_t sub_Pos = 1;
@@ -365,7 +368,7 @@ void page_LockScreen(void) {
       display.setBrightness(10);  // Set brightness level (0-100)
 
       // print arrow buttons
-      printBtnArrows();
+      //printBtnArrows();
     }
 
     months = rtc.getMonth();
@@ -375,6 +378,115 @@ void page_LockScreen(void) {
     minutes = rtc.getMinutes();
     seconds = rtc.getSeconds();
 
+display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font background
+  display.setFont(thinPixel7_10ptFontInfo);
+  //display.on();                           
+
+ enum
+ {
+    clockCenterX = 55,
+    clockCenterY = 22,
+    clockCircleRadius = 20,
+    clockCircleColor = TS_8b_Red,
+    clockMinuteHandLength = 18,
+    clockMinuteHandColor = TS_8b_White,
+    clockHourHandLength = 8,
+    clockHourHandColor = TS_8b_White,
+    clockSecondHandLength = 18,
+    clockSecondHandColor = TS_8b_Yellow
+  };
+
+  drawCircle(clockCenterX, clockCenterY, clockCircleRadius, clockCircleColor);
+  
+  for (int i = 1; i < 15; i++) // Display for 15*1000 milliseconds (15 seconds), update display each second
+  {
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);  
+    months = rtc.getMonth();
+    days = rtc.getDay();
+    years = rtc.getYear();
+    hours = rtc.getHours();
+    minutes = rtc.getMinutes();
+    seconds = rtc.getSeconds();
+    int hourAngle;
+    if (hours >= 12)
+      hourAngle = hours - 12;
+    else
+      hourAngle = hours;
+    hourAngle *= 5;
+    hourAngle += minutes / 12;
+    
+    
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, clockHourHandColor);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, clockMinuteHandColor);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, clockSecondHandColor);
+    
+
+    if (hours <= 12)
+      clock_brightness = hours + 3; // 0 hours = 3 brightness, noon = 15
+    else if (hours >= 18)
+      clock_brightness = (24 - hours) * 2 + 2;  // 23 hours = 4 brightness, 18 hours = 14
+    else
+      clock_brightness = 15; // full brightness all afternoon
+    if (clock_brightness < 3)
+      clock_brightness = 3;
+    if (clock_brightness > 15)
+      clock_brightness = 15;
+    display.setBrightness(clock_brightness);
+    display.setCursor(0,8); //Set the cursor where you want to start printing the date
+    if(months < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(months);
+    display.print("/");
+    days = rtc.getDay();
+    if (days < 10) display.print(0);
+    display.print(days); 
+    // display.print("/");
+    // display.print(years);
+
+    display.setCursor(0,25); //Set the cursor where you want to start printing the date  
+    setTime(hours,minutes,seconds,days,months,2000 +  years);    //values in the order hr,min,sec,day,month,year
+    char wkday[16];
+    strcpy(wkday, dayStr(weekday()));
+    wkday[3] = ' '; wkday[4] = '\0';
+    display.print(wkday); // To keep the text compact, only print the first 3 letters.
+
+    display.setFont(liberationSansNarrow_12ptFontInfo);   //Set the font type
+
+    // display time in HH:MM:SS 24 hour format
+    display.setCursor(0,45); //Set the cursor where you want to start printing the time
+    if(hours < 10) display.print(0); //print a leading 0 if hour value is less than 0
+    display.print(hours);
+    display.print(":");
+    if(minutes < 10) display.print(0); //print a leading 0 if minute value is less than 0
+    display.print(minutes);
+   
+    delay(1000); //display for 1 seconds
+    
+    // Now erase the clock hands by drawing them in black.
+    drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, TS_8b_Black);
+    drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, TS_8b_Black);
+
+    if (hours == alarmHour && minutes == alarmMinute) { //
+
+        if (isOn) {
+          //display.setBrightness(0);
+          //updateDynamicSection = true;
+          display.off(); // Turn off the display
+        } else {
+          //display.setBrightness(20);
+          display.setCursor(32,45);//display.setCursor(32, 45);
+          display.print("Wake up!!");
+          //updateDynamicSection = true;
+          display.on(); // Turn off the display
+        }
+
+        isOn = !isOn;
+      }
+  }
+
+    
+    /*
     // Print date in US format MM:DD:YY (Switch the order in which day, month, year that you like to use)
     display.setCursor(15, 8);  //Set the cursor where you want to start printing the date
     if (months < 10) { display.print(0); }
@@ -407,10 +519,18 @@ void page_LockScreen(void) {
     display.print(seconds);
     display.print(" ");  //just a empty space after the seconds
     //delay(1000); //delay 60 second
+    */
 
 
     // capture button down states
     if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      display.setBrightness(15);
+      btn_Cancel_WasDown = false;
+    }
 
     // move to the root menu
     if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
