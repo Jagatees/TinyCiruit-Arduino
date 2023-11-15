@@ -67,7 +67,7 @@ enum pageType {
 };
 
 // holds which page is currently selected
-enum pageType currPage = LOCK_SCREEN;
+enum pageType currPage = OXIMETER_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -219,8 +219,8 @@ void setup() {
   static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
 
   // init
-  //initWiFi();
-  //initMQTT();
+  initWiFi();
+  initMQTT();
 
   // init the serial port to be used as a display return
   Wire.begin();
@@ -228,13 +228,13 @@ void setup() {
 
   while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
 
-  /*Wireling.selectPort(pulseSensorPort);
+  Wireling.selectPort(pulseSensorPort);
   if (pulseSensor.begin()) {
     while (true) {
       SerialMonitorInterface.println("MAX30101 Wireling not detected!");
       delay(1000);
     }
-  }*/
+  }
 
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {
@@ -283,6 +283,7 @@ void setup() {
   display.setBrightness(10);
   display.setFlip(true);
 
+  SerialMonitorInterface.println("The Watching Video");
 } 
 
 // ========================================================================
@@ -293,6 +294,8 @@ void setup() {
   /**/
 
 void loop() {
+
+  client.loop();
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -329,6 +332,7 @@ void loop() {
       //case GRAPH_SCREEN: page_Graph(); break;
     }
   }
+
 }
 
 // =========================================================================
@@ -718,12 +722,13 @@ void initMQTT() {
   client.subscribe("HootHoot/ProfAnswer");
   SerialMonitorInterface.println("HootHoot/ProfAnswer");
 
-  // client.publish("Hoothoot/Request", "option2");
-  // insert(dict, "Hoothoot/Request", "option2");
-  // print_dictionary(dict);
+  client.subscribe("Announcement");
+  SerialMonitorInterface.println("Announcement");
+
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
+
   SerialMonitorInterface.println("Callback invoked!");
   SerialMonitorInterface.print("Received message on topic '");
   SerialMonitorInterface.print(topic);
@@ -740,6 +745,14 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   String topicStr = String(topic);
   String payloadStr = String(receivedPayload);
+
+
+
+  //getPulseAndBuzzer();
+  // payload 
+  // if (payloadStr == "True"){
+  //   getPulseAndBuzzer();
+  // }
 
   dictionary.add(topicStr, payloadStr);
   dictionary.printAll();

@@ -1015,8 +1015,26 @@ void page_Oximeter(void) {
     loopStartMs = millis();
     client.loop();
 
-    getPulseAndBuzzer();
-
+  if (pulseSensor.update()) {
+      SerialMonitorInterface.print("Update");
+    if (pulseSensor.pulseValid()) {
+      SerialMonitorInterface.print("PulseVaild");
+      SerialMonitorInterface.print(pulseSensor.temperature());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.print(pulseSensor.BPM());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.print(pulseSensor.oxygen());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.println(pulseSensor.cardiogram() * 10.0);
+      updateDynamicSection = true;
+    } else {
+      SerialMonitorInterface.print("Else");
+      SerialMonitorInterface.print(pulseSensor.temperature());
+      SerialMonitorInterface.print("\t");
+      SerialMonitorInterface.println("-\t-\t-");
+      updateDynamicSection = true;
+    }
+  }
 
     // print the display
     if (updateDisplay) {
@@ -1041,18 +1059,20 @@ void page_Oximeter(void) {
       updateDynamicSection = false;
       // Display SpO2
 
-
-
       display.setCursor(10, 20);
-      display.print("SpO2: ");
-      display.print("8");
-      display.print("%");
+
+      display.print("Oxegen:");
+      display.print(pulseSensor.oxygen());
 
       // Display heart rate
       display.setCursor(5, 40);
-      display.print("Heart Rate: ");
-      display.print("80");
-      display.print(" BPM");
+      display.print("Temp: ");
+      display.print(pulseSensor.temperature());
+      display.print("BPM");
+      display.print(pulseSensor.BPM());
+      display.print("Cardiogram");
+      display.print(pulseSensor.cardiogram() * 10.0);
+
     }
 
     // capture button down states
@@ -1254,6 +1274,8 @@ char brightnessChanged=0;
 char brightness=5;
 char movePipe=4;
 char movePipeMod=1;
+bool passedThrough = false;
+
 
 void setBuffer(char i, char amt, unsigned char color){
   char endbyte=i+amt;
