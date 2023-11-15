@@ -1184,7 +1184,104 @@ void page_Telebot(void) {
     while (millis() - loopStartMs < 25) { delay(2); }
   }
 }
+// =========================================================================
+// ||               PAGE - GOOGLE CALENDAR PAGE                           ||
+// =========================================================================
+void page_GoogleCalendar(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
 
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Cancel_WasDown = false;
+
+  String today_event;
+  String today_date;
+  String today_event;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    /*if (dictionary.get("Weather/Response") != "") {
+      result = dictionary.get("Weather/Response");
+
+      int firstComma = result.indexOf(',');
+      int secondComma = result.indexOf(',', firstComma + 1);
+      int thirdComma = result.indexOf(',', secondComma + 1);
+
+      weather_condition = result.substring(0, firstComma);
+      temperature = result.substring(firstComma + 1, secondComma);
+      temperature_max = result.substring(secondComma + 1, thirdComma);
+      temperature_min = result.substring(thirdComma + 1);
+    }*/
+    //today_event = dictionary.get("Announcement/Prof/Topic");
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ GOOGLE CALENDAR ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+
+      if (today_event != "") {
+        display.print("")
+      } else {
+        display.print("No Events today");
+      }
+
+
+      /*
+      if (prof_result != "") {
+        display.setCursor(0, 22);
+        display.print(prof_result);
+      }
+      display.setCursor(0, 32); 
+      display.print(openai_result);
+      if (openai_result != "") {
+        if (sentResponse) {
+          display.setCursor(0, 45);
+          display.print("Response sent!");
+        }
+
+      }*/
+      // 2 buttons, one to respond with openAI_result, one go back to main menu
+    }
+
+    // capture button down states
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU1;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
 
 // =========================================================================
 // ||                          PAGE - GAME PAGE                           ||
