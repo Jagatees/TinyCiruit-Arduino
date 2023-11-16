@@ -51,6 +51,7 @@ enum pageType {
   ATTENDANCE_SCREEN,
   SILENTHELPER_SCREEN,
   TELEBOT_SCREEN,
+  GOOGLE_SCREEN,
   // System
   WEATHER_SCREEN,
   ALARM_SCREEN,
@@ -315,6 +316,7 @@ void loop() {
       case SILENTHELPER_SCREEN: page_SilentHelper(); break;
       case ATTENDANCE_SCREEN: page_Attendance(); break;
       case TELEBOT_SCREEN: page_Telebot(); break;
+      case GOOGLE_SCREEN: page_GoogleCalendar(); break
 
       // System Screens
       case WEATHER_SCREEN: page_Weather(); break;
