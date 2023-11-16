@@ -60,10 +60,10 @@ void page_SubMenu1(void) {
       printSelected(3, sub_Pos); display.print("Hoot Hoot");
 
       display.setCursor(0, 40);
-      printSelected(4, sub_Pos); display.print("Telebot");
+      printSelected(4, sub_Pos); display.print("Open AI");
 
       display.setCursor(0, 50);
-      printSelected(5, sub_Pos); display.print("Google Calendar");
+      printSelected(5, sub_Pos); display.print("Telebot");
 
       // print a divider line
       display.setCursor(0, 50);
@@ -101,8 +101,8 @@ void page_SubMenu1(void) {
         case 1: currPage = ATTENDANCE_SCREEN; return;
         case 2: currPage = SILENTHELPER_SCREEN;return;
         case 3: currPage = HOOTHOOT_START_SCREEN; return;
-        case 4: currPage = TELEBOT_SCREEN; return;
-        case 5: currPage = GOOGLE_SCREEN; return;
+        case 4: currPage = OPENAI_SCREEN; return;
+        case 5: currPage = TELEBOT_SCREEN; return;
       }
     }
     // move to the root menu

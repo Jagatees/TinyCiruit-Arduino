@@ -49,9 +49,9 @@ enum pageType {
   HOOTHOOT_QUIZ_SCREEN,
   HOOTHOOT_SUBMISSION_SCREEN,
   ATTENDANCE_SCREEN,
+  OPENAI_SCREEN,
   SILENTHELPER_SCREEN,
   TELEBOT_SCREEN,
-  GOOGLE_SCREEN,
   // System
   WEATHER_SCREEN,
   ALARM_SCREEN,
@@ -99,14 +99,14 @@ int pulseSensorPort = 2;
 // ||                          VARIABLES - WIFI & MQTT                      ||
 // =========================================================================
 
-const char* ssid = "Jagatees-Phone";
-const char* wifiPassword = "1234567890";
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "172.20.10.2";
+const char* mqttServer = "192.168.1.83";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -295,7 +295,16 @@ void setup() {
 
 void loop() {
 
+ 
+  // Put both of this in every loop and page section to can check status with MQTT IMPORTANT
   client.loop();
+  if (!client.connected()) {
+    SerialMonitorInterface.println("I have disconnected");
+    reconnectMQTT();
+  }
+
+  // client.publish("Hello/Andrino", "Yes");
+
 
   if (currPage == LOCK_SCREEN) {
     // start tracking the milliseconds
@@ -313,10 +322,10 @@ void loop() {
       case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
       case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
       case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
+      case OPENAI_SCREEN: page_OpenAI(); break;
       case SILENTHELPER_SCREEN: page_SilentHelper(); break;
       case ATTENDANCE_SCREEN: page_Attendance(); break;
       case TELEBOT_SCREEN: page_Telebot(); break;
-      case GOOGLE_SCREEN: page_GoogleCalendar(); break
 
       // System Screens
       case WEATHER_SCREEN: page_Weather(); break;
@@ -699,6 +708,31 @@ void initMQTT() {
     SerialMonitorInterface.println("Attempting to connect to MQTT broker...");
     if (client.connect("mqtt-ardunio-derpee")) {
       SerialMonitorInterface.println("Successfully connected to MQTT broker!");
+
+      client.subscribe("HootHoot/Start");
+      SerialMonitorInterface.println("HootHoot/Start");
+
+      client.subscribe("HootHoot/Question1/Option1");
+      SerialMonitorInterface.println("HootHoot/Question1/Option1");
+
+      client.subscribe("HootHoot/Question1/Option2");
+      SerialMonitorInterface.println("HootHoot/Question1/Option2");
+
+      client.subscribe("HootHoot/Question1/ProfAnswer");
+      SerialMonitorInterface.println("HootHoot/ProfAnswer");
+      
+      client.subscribe("tele/Announcement");
+      SerialMonitorInterface.println("tele/Announcement");
+
+      client.subscribe("tele/Jake");
+      SerialMonitorInterface.println("tele/Jake");
+
+      client.subscribe("Weather/Response");
+      SerialMonitorInterface.println("Weather/Response");
+
+      client.subscribe("tele/SuggestedResponse");
+      SerialMonitorInterface.println("tele/SuggestedResponse");
+
       break;
     }
 
@@ -712,35 +746,54 @@ void initMQTT() {
   // client.publish()
 
   // HootHoot Quiz
-  client.subscribe("HootHoot/Start");
-  SerialMonitorInterface.println("HootHoot/Start");
-
-  client.subscribe("HootHoot/Question1/Option1");
-  SerialMonitorInterface.println("HootHoot/Question1/Option1");
-
-  client.subscribe("HootHoot/Question1/Option2");
-  SerialMonitorInterface.println("HootHoot/Question1/Option2");
-
-  client.subscribe("HootHoot/Question1/ProfAnswer");
-  SerialMonitorInterface.println("HootHoot/ProfAnswer");
   
-  client.subscribe("tele/Announcement");
-  SerialMonitorInterface.println("tele/Announcement");
-
-  client.subscribe("tele/Jake");
-  SerialMonitorInterface.println("tele/Jake");
-
-  client.subscribe("Weather/Response");
-  SerialMonitorInterface.println("Weather/Response");
-
-  client.subscribe("tele/SuggestedResponse");
-  SerialMonitorInterface.println("tele/SuggestedResponse");
   
 
 }
 
-void callback(char* topic, byte* payload, unsigned int length) {
+void reconnectMQTT() {
+    // Loop until we're reconnected
+    while (!client.connected()) {
+        SerialMonitorInterface.print("Attempting MQTT connection...");
+        // Attempt to connect
+        if (client.connect("mqtt-ardunio-derpee")) {
+            SerialMonitorInterface.println("connected");
+            // Resubscribe
+            client.subscribe("HootHoot/Start");
+            SerialMonitorInterface.println("HootHoot/Start");
 
+            client.subscribe("HootHoot/Question1/Option1");
+            SerialMonitorInterface.println("HootHoot/Question1/Option1");
+
+            client.subscribe("HootHoot/Question1/Option2");
+            SerialMonitorInterface.println("HootHoot/Question1/Option2");
+
+            client.subscribe("HootHoot/Question1/ProfAnswer");
+            SerialMonitorInterface.println("HootHoot/ProfAnswer");
+            
+            client.subscribe("tele/Announcement");
+            SerialMonitorInterface.println("tele/Announcement");
+
+            client.subscribe("tele/Jake");
+            SerialMonitorInterface.println("tele/Jake");
+
+            client.subscribe("Weather/Response");
+            SerialMonitorInterface.println("Weather/Response");
+
+            client.subscribe("tele/SuggestedResponse");
+            SerialMonitorInterface.println("tele/SuggestedResponse");
+            // ... add other subscriptions as needed ...
+        } else {
+            SerialMonitorInterface.print("failed, rc=");
+            SerialMonitorInterface.print(client.state());
+            SerialMonitorInterface.println(" try again in 5 seconds");
+            // Wait 5 seconds before retrying
+            delay(5000);
+        }
+    }
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
   SerialMonitorInterface.println("Callback invoked!");
   SerialMonitorInterface.print("Received message on topic '");
   SerialMonitorInterface.print(topic);

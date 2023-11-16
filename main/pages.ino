@@ -514,7 +514,100 @@ void page_HootHootSubmission(void) {
     while (millis() - loopStartMs < 25) { delay(2); }
   }
 }
+// =========================================================================
+// ||                         PAGE - OPENAI PAGE                           ||
+// =========================================================================
+void page_OpenAI(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+  boolean sentResponse = false;
 
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+
+  String prof_result;
+  String openai_result;
+
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    prof_result = dictionary.get("Announcement/Prof/Topic");
+    openai_result = dictionary.get("Announcement/Prof/OpenAI");
+
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ OPENAI ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+
+      if (prof_result != "") {
+        display.setCursor(0, 22);
+        display.print(prof_result);
+      }
+
+      if (openai_result != "") {
+        if (sentResponse) {
+          display.setCursor(0, 42);
+          display.print("Response sent!");
+        } else {
+          display.setCursor(0, 32); 
+          display.print("Suggested Response:");
+          display.setCursor(0, 42); 
+          display.print(openai_result);
+        }
+
+      } else {
+        display.setCursor(0, 45);
+        display.print(sentResponse);
+      }
+      // 2 buttons, one to respond with openAI_result, one go back to main menu
+    }
+
+    // capture button down states
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      sentResponse = true;
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU1;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
 // =========================================================================
 // ||                          PAGE - ATTENDANCE PAGE                     || 
 // =========================================================================  
@@ -570,8 +663,8 @@ void page_Attendance (void) {
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      client.publish("Attendance","Jake");
-      name = "Jake";
+      client.publish("Attendance","Vanessa");
+      name = "Vanessa";
       display.setCursor(0, 42);
       display.print("Attendance taken!");
 
@@ -804,7 +897,6 @@ void page_Alarm(void) {
   int setHour = 0;
   int setMinute = 0;
 
-  bool alarmSetResponse = false;
   bool isOn = true;
 
   // inner loop
@@ -848,10 +940,6 @@ void page_Alarm(void) {
 
       display.print(setMinute);
 
-      if (alarmSetResponse) {
-        display.setCursor(24, 50);
-        display.print("Alarm Set");
-      }
       if (hours == alarmHour && minutes == alarmMinute && alarmSet == true) { //
           //if (!isOn) { isOn = true; }
           //display.clearWindow(20, 45, 50, 16);
@@ -906,8 +994,6 @@ void page_Alarm(void) {
     // move to the root menu
     if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
       set_alarm(setHour, setMinute);
-      alarmSetResponse = true;
-      updateDynamicSection = true;
       btn_Accept_WasDown = false;
     }
   // keep a specific pace
@@ -1050,12 +1136,14 @@ void page_Telebot(void) {
   String thirdResponse;
   String fourthResponse;
 
+  String user_input;
   // inner loop
   while (true) {
     loopStartMs = millis();
 
     client.loop();
 
+// HootHoot/Start True
     if (dictionary.get("tele/Announcement") != "") {
       tele_announcement = dictionary.get("tele/Announcement");
 
@@ -1105,14 +1193,22 @@ display.print("No data Yet");
       display.setCursor(10,22);
       display.print(tele_announcement);
 
-      display.setCursor(64, 22);
-      display.print(firstResponse);
+      if (dictionary.get("tele/SuggestedResponse") == "") {
+        firstResponse = "Yes";
+        display.setCursor(24, 45);
+        display.print("Yes");
 
-      display.setCursor(24, 45);
-      display.print(secondResponse);
+        secondResponse = "No";
+        display.setCursor(64, 45);
+        display.print("No");
+      } else {
+        display.setCursor(24, 45);
+        display.print(firstResponse);
 
-      display.setCursor(64, 45);
-      display.print(thirdResponse);
+        display.setCursor(64, 45);
+        display.print(secondResponse);
+      }
+
 
 
       /*if (tele_annoucement != "") {
@@ -1140,23 +1236,21 @@ display.print("No data Yet");
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      user_input = secondResponse + "By Jake";
       sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
       updateDynamicSection = true;
       btn_Down_WasDown = false;
     }
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      user_input = firstResponse + "By Jake";
       sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
+
       updateDynamicSection = true;
       btn_Up_WasDown = false;
-    }
-
-        // move the pointer up
-    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
-      sentResponse = true;
-      updateDynamicSection = true;
-      btn_Accept_WasDown = false;
     }
 
     // move to the root menu
