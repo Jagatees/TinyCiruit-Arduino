@@ -663,8 +663,8 @@ void page_Attendance (void) {
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      client.publish("Attendance","Jake");
-      name = "Jake";
+      client.publish("Attendance","Vanessa");
+      name = "Vanessa";
       display.setCursor(0, 42);
       display.print("Attendance taken!");
 
@@ -1136,12 +1136,14 @@ void page_Telebot(void) {
   String thirdResponse;
   String fourthResponse;
 
+  String user_input;
   // inner loop
   while (true) {
     loopStartMs = millis();
 
     client.loop();
 
+// HootHoot/Start True
     if (dictionary.get("tele/Announcement") != "") {
       tele_announcement = dictionary.get("tele/Announcement");
 
@@ -1191,14 +1193,22 @@ display.print("No data Yet");
       display.setCursor(10,22);
       display.print(tele_announcement);
 
-      display.setCursor(64, 22);
-      display.print(firstResponse);
+      if (dictionary.get("tele/SuggestedResponse") == "") {
+        firstResponse = "Yes";
+        display.setCursor(24, 45);
+        display.print("Yes");
 
-      display.setCursor(24, 45);
-      display.print(secondResponse);
+        secondResponse = "No";
+        display.setCursor(64, 45);
+        display.print("No");
+      } else {
+        display.setCursor(24, 45);
+        display.print(firstResponse);
 
-      display.setCursor(64, 45);
-      display.print(thirdResponse);
+        display.setCursor(64, 45);
+        display.print(secondResponse);
+      }
+
 
 
       /*if (tele_annoucement != "") {
@@ -1226,23 +1236,21 @@ display.print("No data Yet");
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      user_input = secondResponse + "By Jake";
       sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
       updateDynamicSection = true;
       btn_Down_WasDown = false;
     }
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      user_input = firstResponse + "By Jake";
       sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
+
       updateDynamicSection = true;
       btn_Up_WasDown = false;
-    }
-
-        // move the pointer up
-    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
-      sentResponse = true;
-      updateDynamicSection = true;
-      btn_Accept_WasDown = false;
     }
 
     // move to the root menu
