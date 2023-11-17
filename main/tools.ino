@@ -124,3 +124,61 @@ void downArrow(int x, int y) {
   display.drawLine(x + 1, y + 1, x + 3, y + 1, 0xFFFF);
   display.drawLine(x + 2, y + 2, x + 2, y + 2, 0xFFFF);
 }
+// =========================================================================
+// ||                          ALARM DISPLAY                              ||
+// =========================================================================
+void drawCircle(int x0, int y0, int radius, uint8_t color)
+{
+  int x = radius;
+  int y = 0;
+  int radiusError = 1-x;
+ 
+  while(x >= y)
+  {
+    //drawPixel(x,y,color);//set pixel (x,y) to specified color. This is slow because we need to send commands setting the x and y, then send the pixel data.
+    display.drawPixel(x + x0, y + y0, color);
+    display.drawPixel(y + x0, x + y0, color);
+    display.drawPixel(-x + x0, y + y0, color);
+    display.drawPixel(-y + x0, x + y0, color);
+    display.drawPixel(-x + x0, -y + y0, color);
+    display.drawPixel(-y + x0, -x + y0, color);
+    display.drawPixel(x + x0, -y + y0, color);
+    display.drawPixel(y + x0, -x + y0, color);
+    y++;
+    if (radiusError<0)
+    {
+      radiusError += 2 * y + 1;
+    }
+    else
+    {
+      x--;
+      radiusError += 2 * (y - x) + 1;
+    }
+  }
+}
+
+void drawHand(int xStart, int yStart, int angle, int radius, unsigned char color)
+
+{
+  static int sine[16] = {0, 27, 54, 79, 104, 128, 150, 171, 190, 201, 221, 233, 243, 250, 254, 255};
+  int xEnd, yEnd, quadrant, x_flip, y_flip;
+
+  // calculate which quadrant the hand lies in
+  quadrant = angle/15 ;
+
+  switch ( quadrant )
+  {
+    case 0 : x_flip = 1 ; y_flip = -1 ; break ;
+    case 1 : angle = abs(angle-30) ; x_flip = y_flip = 1 ; break ;
+    case 2 : angle = angle-30 ; x_flip = -1 ; y_flip = 1 ; break ;
+    case 3 : angle = abs(angle-60) ; x_flip = y_flip = -1 ; break ; 
+    default:  x_flip = y_flip = 1; // this should not happen
+  }
+
+  xEnd = xStart;
+  yEnd = yStart;
+  xEnd += (x_flip * (( sine[angle] * radius ) >> 8));
+  yEnd += (y_flip * (( sine[15-angle] * radius ) >> 8));
+
+  display.drawLine(xStart, yStart, xEnd, yEnd, color);
+}
