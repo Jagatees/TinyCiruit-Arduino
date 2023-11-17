@@ -49,9 +49,9 @@ enum pageType {
   HOOTHOOT_QUIZ_SCREEN,
   HOOTHOOT_SUBMISSION_SCREEN,
   ATTENDANCE_SCREEN,
-  OPENAI_SCREEN,
   SILENTHELPER_SCREEN,
   TELEBOT_SCREEN,
+  GOOGLE_SCREEN,
   // System
   WEATHER_SCREEN,
   ALARM_SCREEN,
@@ -322,10 +322,10 @@ void loop() {
       case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
       case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
       case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
-      case OPENAI_SCREEN: page_OpenAI(); break;
       case SILENTHELPER_SCREEN: page_SilentHelper(); break;
       case ATTENDANCE_SCREEN: page_Attendance(); break;
       case TELEBOT_SCREEN: page_Telebot(); break;
+      case GOOGLE_SCREEN: page_GoogleCalendar(); break;
 
       // System Screens
       case WEATHER_SCREEN: page_Weather(); break;
