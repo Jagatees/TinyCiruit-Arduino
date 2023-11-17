@@ -58,12 +58,7 @@ enum pageType {
   OXIMETER_SCREEN,
   // Entertainment
   AUDIO_SCREEN,
-  GAME_SCREEN,
-  // Misc
-  TEST_SCREEN,
-  GRAPH_SCREEN,
-  HEART_SCREEN,
-  DISPLAY_ALARM_SCREEN
+  GAME_SCREEN
 };
 
 // holds which page is currently selected
@@ -335,10 +330,6 @@ void loop() {
       // Entertainment Screens
       case AUDIO_SCREEN: page_Audio(); break;
       case GAME_SCREEN: page_Game(); break;
-
-      // Misc
-      case TEST_SCREEN: page_Test(); break;
-      //case GRAPH_SCREEN: page_Graph(); break;
     }
   }
 
