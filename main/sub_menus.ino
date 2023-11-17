@@ -65,6 +65,9 @@ void page_SubMenu1(void) {
       display.setCursor(0, 50);
       printSelected(5, sub_Pos); display.print("Google Calendar");
 
+      display.setCursor(0, 60);
+      printSelected(5, sub_Pos); display.print("SMS");
+
 
 
       // print a divider line
@@ -105,6 +108,7 @@ void page_SubMenu1(void) {
         case 3: currPage = HOOTHOOT_START_SCREEN; return;
         case 4: currPage = TELEBOT_SCREEN; return;
         case 5: currPage = GOOGLE_SCREEN; return;
+        case 6: currPage = SMS_SCREEN; return;
       }
     }
     // move to the root menu

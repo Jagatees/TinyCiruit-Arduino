@@ -1097,6 +1097,142 @@ display.print("No data Yet");
   }
 }
 // =========================================================================
+// ||                         PAGE - SMS PAGE                           ||
+// =========================================================================
+void page_SMS(void) {
+  // flag for updating the display
+  boolean updateDisplay = true;
+  boolean updateDynamicSection = true;
+  boolean sentResponse = false;
+  boolean readyToStart = false;
+  // tracks when entered top of loop
+  uint32_t loopStartMs;
+
+  //tracks button states
+  boolean btn_Up_WasDown = false;
+  boolean btn_Down_WasDown = false;
+  boolean btn_Cancel_WasDown = false;
+  boolean btn_Accept_WasDown = false;
+
+  String tele_announcement;
+  String tele_jake;
+  String result;
+
+  String firstResponse;
+  String secondResponse;
+  String thirdResponse;
+  String fourthResponse;
+
+  String user_input;
+  // inner loop
+  while (true) {
+    loopStartMs = millis();
+
+    client.loop();
+
+    // HootHoot/Start True
+    if (dictionary.get("tele/Announcement") != "") {
+      tele_announcement = dictionary.get("tele/Announcement");
+
+      if (dictionary.get("tele/SuggestedResponse") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
+        result = dictionary.get("tele/SuggestedResponse");
+
+        int firstComma = result.indexOf(',');
+        int secondComma = result.indexOf(',', firstComma + 1);
+        int thirdComma = result.indexOf(',', secondComma + 1);
+
+        firstResponse = result.substring(0, firstComma);
+        secondResponse = result.substring(firstComma + 1, secondComma);
+        thirdResponse = result.substring(secondComma + 1, thirdComma);
+        fourthResponse = result.substring(thirdComma + 1);
+
+        readyToStart = true;
+      } else {
+        display.print("No data Yet");
+      }
+    } else {
+      display.print("No data Yet");
+    }
+    
+    tele_jake = dictionary.get("tele/Jake");
+    
+    // print the display
+    if (updateDisplay) {
+      // clear the update flag
+      updateDisplay = false;
+      // clear the display
+      clearScreen();
+
+      // start the display
+      display.begin();
+      display.setBrightness(10);  // Set brightness level (0-100)
+
+      // print arrow buttons
+      printBtnArrows();
+
+      // menu title
+      display.setCursor(0, 0);
+      display.print("[ TELEBOT ]");
+    }
+
+    if (updateDynamicSection) {
+      updateDynamicSection = false;
+      display.setCursor(10,22);
+      display.print(tele_announcement);
+
+      if (dictionary.get("tele/SuggestedResponse") == "") {
+        firstResponse = "Yes";
+        display.setCursor(24, 45);
+        display.print("Yes");
+
+        secondResponse = "No";
+        display.setCursor(64, 45);
+        display.print("No");
+      } else {
+        display.setCursor(24, 45);
+        display.print(firstResponse);
+
+        display.setCursor(64, 45);
+        display.print(secondResponse);
+      }
+    }
+
+    // capture button down states
+    if (btnIsDown(BTN_UP)) { btn_Up_WasDown = true; }
+    if (btnIsDown(BTN_DOWN)) { btn_Down_WasDown = true; }
+    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
+
+    // move the pointer up
+    if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
+      user_input = secondResponse + "By Jake";
+      sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
+      updateDynamicSection = true;
+      btn_Down_WasDown = false;
+    }
+
+        // move the pointer up
+    if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
+      user_input = firstResponse + "By Jake";
+      sentResponse = true;
+      client.publish("tele/Request", user_input.c_str());
+
+      updateDynamicSection = true;
+      btn_Up_WasDown = false;
+    }
+
+    // move to the root menu
+    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+      currPage = SUB_MENU1;
+      return;
+    }
+
+    // keep a specific pace
+    while (millis() - loopStartMs < 25) { delay(2); }
+  }
+}
+// =========================================================================
 // ||               PAGE - GOOGLE CALENDAR PAGE                           ||
 // =========================================================================
 void page_GoogleCalendar(void) {
