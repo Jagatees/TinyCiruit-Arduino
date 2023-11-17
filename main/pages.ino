@@ -26,7 +26,11 @@ void page_Weather(void) {
   while(true){
     loopStartMs = millis();
 
-    client.loop();
+      client.loop();
+      if (!client.connected()) {
+        SerialMonitorInterface.println("I have disconnected");
+        reconnectMQTT();
+      }
 
     if (dictionary.get("Weather/Response") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
       result = dictionary.get("Weather/Response");
@@ -156,6 +160,10 @@ void page_HootHootStart(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     // print the display
     if (updateDisplay) {
@@ -183,6 +191,11 @@ void page_HootHootStart(void) {
       display.setCursor(24, 32);
 
       client.loop();
+      if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+      }
+
       String result = dictionary.get("HootHoot/Start");
 
       if (result == "True") {
@@ -258,6 +271,10 @@ void page_HootHootQuiz(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     if (dictionary.get("HootHoot/Question1/Option1") == "A") {
       result1 = dictionary.get("HootHoot/Question1/Option1");
@@ -367,6 +384,10 @@ void page_HootHootSubmission(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
     String result = dictionary.get("HootHoot/Question1/ProfAnswer");
 
     // print the display
@@ -529,6 +550,10 @@ void page_SilentHelper(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     // print the display
     if (updateDisplay) {
@@ -611,6 +636,10 @@ void page_Audio(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     
     // print the display
@@ -860,6 +889,10 @@ void page_Oximeter(void) {
   while (true) {
     loopStartMs = millis();
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
   if (pulseSensor.update()) {
       SerialMonitorInterface.print("Update");
@@ -975,6 +1008,10 @@ void page_Telebot(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
 // HootHoot/Start True
     if (dictionary.get("tele/Announcement") != "") {
@@ -1129,10 +1166,14 @@ void page_SMS(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     // HootHoot/Start True
-    if (dictionary.get("tele/Announcement") != "") {
-      tele_announcement = dictionary.get("tele/Announcement");
+    if (dictionary.get("tele/jake") != "") {
+      tele_announcement = dictionary.get("tele/jake");
 
       if (dictionary.get("tele/SuggestedResponse") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
         result = dictionary.get("tele/SuggestedResponse");
@@ -1154,7 +1195,7 @@ void page_SMS(void) {
       display.print("No data Yet");
     }
     
-    tele_jake = dictionary.get("tele/Jake");
+    tele_jake = dictionary.get("tele/jake");
     
     // print the display
     if (updateDisplay) {
@@ -1172,7 +1213,7 @@ void page_SMS(void) {
 
       // menu title
       display.setCursor(0, 0);
-      display.print("[ TELEBOT ]");
+      display.print("[ SMS ]");
     }
 
     if (updateDynamicSection) {
@@ -1207,7 +1248,7 @@ void page_SMS(void) {
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
       user_input = secondResponse + "By Jake";
       sentResponse = true;
-      client.publish("tele/Request", user_input.c_str());
+      client.publish("tele/pmRequest", user_input.c_str());
       updateDynamicSection = true;
       btn_Down_WasDown = false;
     }
@@ -1216,7 +1257,7 @@ void page_SMS(void) {
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
       user_input = firstResponse + "By Jake";
       sentResponse = true;
-      client.publish("tele/Request", user_input.c_str());
+      client.publish("tele/pmRequest", user_input.c_str());
 
       updateDynamicSection = true;
       btn_Up_WasDown = false;
@@ -1254,6 +1295,10 @@ void page_GoogleCalendar(void) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     /*if (dictionary.get("Weather/Response") != "") {
       result = dictionary.get("Weather/Response");
@@ -1537,6 +1582,10 @@ void game_Over(int score) {
     loopStartMs = millis();
 
     client.loop();
+    if (!client.connected()) {
+      SerialMonitorInterface.println("I have disconnected");
+      reconnectMQTT();
+    }
 
     // print the display
     if (updateDisplay) {

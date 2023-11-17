@@ -26,7 +26,7 @@
 
 /* Menu Definitions */
 #define ROOT_MENU_COUNT 3
-#define SUB_MENU1_COUNT 5
+#define SUB_MENU1_COUNT 6
 #define SUB_MENU2_COUNT 3
 #define SUB_MENU3_COUNT 2
 #define LOCK_SCREEN_DURATION 10000  // 60 secs
@@ -718,11 +718,9 @@ void initMQTT() {
       SerialMonitorInterface.println("tele/Announcement");
 
       // Announcement & SuggestedResponse
-      client.subscribe("tele/Jake");
-      SerialMonitorInterface.println("tele/Jake");
+      client.subscribe("tele/jake");
+      SerialMonitorInterface.println("tele/jake");
 
-      // SuggestedResponse & pmRequest
-      // client.publish("tele/pmRequest", value);
 
       client.subscribe("Weather/Response");
       SerialMonitorInterface.println("Weather/Response");
@@ -766,7 +764,7 @@ void reconnectMQTT() {
             
             client.subscribe("tele/Announcement");
 
-            client.subscribe("tele/Jake");
+            client.subscribe("tele/jake");
 
             client.subscribe("Weather/Response");
 
