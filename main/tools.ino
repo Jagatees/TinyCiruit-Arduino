@@ -165,7 +165,6 @@ void display_Alarm_Notif(int hour, int minute) {
       //isOn = !isOn;*/
   } else {
     display.clearScreen();
-    switch_page();
   }
 } 
 
@@ -320,29 +319,4 @@ void displayClockTime()
 
 }
 
-// =========================================================================
-// ||                          SWITCH PAGES                              ||
-// =========================================================================
-void switch_page(void) {
-  switch (currPage) {
-    case LOCK_SCREEN: page_LockScreen(); break;
-    case ROOT_MENU: page_RootMenu(); break;
-    case SUB_MENU1: page_SubMenu1(); break;
-    case SUB_MENU2: page_SubMenu2(); break;
-    case SUB_MENU3: page_SubMenu3(); break;
-    case WEATHER_SCREEN: page_Weather(); break;
-    case TEST_SCREEN: page_Test(); break;
-    //case GRAPH_SCREEN: page_Graph(); break;
-    case HOOTHOOT_START_SCREEN: page_HootHootStart(); break;
-    case HOOTHOOT_QUIZ_SCREEN: page_HootHootQuiz(); break;
-    case HOOTHOOT_SUBMISSION_SCREEN: page_HootHootSubmission(); break;
-    case ALARM_SCREEN: page_Alarm(); break;
-    //case ATTENDANCE_SCREEN: page_Attendance(); break;
-    case OPENAI_SCREEN: page_OpenAI(); break;
-    case SILENTHELPER_SCREEN: page_SilentHelper(); break;
-    case AUDIO_SCREEN: page_Audio(); break;
-    case GAME_SCREEN: page_Game(); break;
-    case OXIMETER_SCREEN: page_Oximeter(); break;
-    //case TELEBOT_SCREEN: page_Telebot(); break;
-  }
-}
+

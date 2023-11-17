@@ -724,8 +724,12 @@ void initMQTT() {
       client.subscribe("tele/Announcement");
       SerialMonitorInterface.println("tele/Announcement");
 
+      // Announcement & SuggestedResponse
       client.subscribe("tele/Jake");
       SerialMonitorInterface.println("tele/Jake");
+
+      // SuggestedResponse & pmRequest
+      // client.publish("tele/pmRequest", value);
 
       client.subscribe("Weather/Response");
       SerialMonitorInterface.println("Weather/Response");
@@ -760,28 +764,20 @@ void reconnectMQTT() {
             SerialMonitorInterface.println("connected");
             // Resubscribe
             client.subscribe("HootHoot/Start");
-            SerialMonitorInterface.println("HootHoot/Start");
 
             client.subscribe("HootHoot/Question1/Option1");
-            SerialMonitorInterface.println("HootHoot/Question1/Option1");
 
             client.subscribe("HootHoot/Question1/Option2");
-            SerialMonitorInterface.println("HootHoot/Question1/Option2");
 
             client.subscribe("HootHoot/Question1/ProfAnswer");
-            SerialMonitorInterface.println("HootHoot/ProfAnswer");
             
             client.subscribe("tele/Announcement");
-            SerialMonitorInterface.println("tele/Announcement");
 
             client.subscribe("tele/Jake");
-            SerialMonitorInterface.println("tele/Jake");
 
             client.subscribe("Weather/Response");
-            SerialMonitorInterface.println("Weather/Response");
 
             client.subscribe("tele/SuggestedResponse");
-            SerialMonitorInterface.println("tele/SuggestedResponse");
             // ... add other subscriptions as needed ...
         } else {
             SerialMonitorInterface.print("failed, rc=");
