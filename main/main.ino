@@ -95,14 +95,14 @@ int pulseSensorPort = 2;
 // ||                          VARIABLES - WIFI & MQTT                      ||
 // =========================================================================
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "ZFCROW";
+const char* wifiPassword = "zfcrow1122";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
+const char* mqttServer = "192.168.37.192";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -721,12 +721,18 @@ void initMQTT() {
       client.subscribe("tele/jake");
       SerialMonitorInterface.println("tele/jake");
 
+      // Announcement & SuggestedResponse
+      client.subscribe("tele/Jagatees");
+      SerialMonitorInterface.println("tele/Jagatees");
 
       client.subscribe("Weather/Response");
       SerialMonitorInterface.println("Weather/Response");
 
       client.subscribe("tele/SuggestedResponse");
       SerialMonitorInterface.println("tele/SuggestedResponse");
+
+      client.subscribe("Googlecal/Response");
+      SerialMonitorInterface.println("Googlecal/Response");
 
       break;
     }
@@ -764,11 +770,15 @@ void reconnectMQTT() {
             
             client.subscribe("tele/Announcement");
 
-            client.subscribe("tele/jake");
+            client.subscribe("tele/Jake");
+
+            client.subscribe("tele/Jagatees");
 
             client.subscribe("Weather/Response");
 
             client.subscribe("tele/SuggestedResponse");
+
+            client.subscribe("Googlecal/Response");
             // ... add other subscriptions as needed ...
         } else {
             SerialMonitorInterface.print("failed, rc=");

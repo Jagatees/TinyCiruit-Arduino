@@ -509,8 +509,8 @@ void page_Attendance (void) {
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      client.publish("Attendance","Vanessa");
-      name = "Vanessa";
+      client.publish("Attendance","Jagatees");
+      name = "Jagatees";
       display.setCursor(0, 42);
       display.print("Attendance taken!");
 
@@ -584,7 +584,7 @@ void page_SilentHelper(void) {
       display.print("Press down button");
 
       if (sentResponse) {
-        client.publish("Studenthelp" , "Jake");
+        client.publish("Studenthelp" , "Jagatees");
         display.setCursor(0, 42);
         display.print("Response sent!");
       }
@@ -1037,7 +1037,7 @@ display.print("No data Yet");
       display.print("No data Yet");
     }
     
-    tele_jake = dictionary.get("tele/Jake");
+    tele_jake = dictionary.get("tele/Jagatees");
     
     // print the display
     if (updateDisplay) {
@@ -1106,7 +1106,7 @@ display.print("No data Yet");
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      user_input = secondResponse + "By Jake";
+      user_input = secondResponse + "By Jagatees";
       sentResponse = true;
       client.publish("tele/Request", user_input.c_str());
       updateDynamicSection = true;
@@ -1115,7 +1115,7 @@ display.print("No data Yet");
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      user_input = firstResponse + "By Jake";
+      user_input = firstResponse + "By Jagatees";
       sentResponse = true;
       client.publish("tele/Request", user_input.c_str());
 
@@ -1172,8 +1172,8 @@ void page_SMS(void) {
     }
 
     // HootHoot/Start True
-    if (dictionary.get("tele/jake") != "") {
-      tele_announcement = dictionary.get("tele/jake");
+    if (dictionary.get("tele/Jagatees") != "") {
+      tele_announcement = dictionary.get("tele/Jagatees");
 
       if (dictionary.get("tele/SuggestedResponse") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
         result = dictionary.get("tele/SuggestedResponse");
@@ -1195,7 +1195,7 @@ void page_SMS(void) {
       display.print("No data Yet");
     }
     
-    tele_jake = dictionary.get("tele/jake");
+    tele_jake = dictionary.get("tele/Jagatees");
     
     // print the display
     if (updateDisplay) {
@@ -1246,7 +1246,7 @@ void page_SMS(void) {
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      user_input = secondResponse + "By Jake";
+      user_input = secondResponse + "By Jagatees";
       sentResponse = true;
       client.publish("tele/pmRequest", user_input.c_str());
       updateDynamicSection = true;
@@ -1255,7 +1255,7 @@ void page_SMS(void) {
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      user_input = firstResponse + "By Jake";
+      user_input = firstResponse + "By Jagatees";
       sentResponse = true;
       client.publish("tele/pmRequest", user_input.c_str());
 
@@ -1290,6 +1290,16 @@ void page_GoogleCalendar(void) {
   String today_event;
   String today_date;
 
+  String tele_announcement;
+  String tele_jake;
+  String result;
+
+  String weather_condition;
+  String temperature;
+  String temperature_max;
+  String fourthRetemperature_minsponse;
+  String temperature_min;
+
   // inner loop
   while (true) {
     loopStartMs = millis();
@@ -1300,8 +1310,8 @@ void page_GoogleCalendar(void) {
       reconnectMQTT();
     }
 
-    /*if (dictionary.get("Weather/Response") != "") {
-      result = dictionary.get("Weather/Response");
+    if (dictionary.get("Googlecal/Response") != "") {
+      result = dictionary.get("Googlecal/Response");
 
       int firstComma = result.indexOf(',');
       int secondComma = result.indexOf(',', firstComma + 1);
@@ -1311,8 +1321,9 @@ void page_GoogleCalendar(void) {
       temperature = result.substring(firstComma + 1, secondComma);
       temperature_max = result.substring(secondComma + 1, thirdComma);
       temperature_min = result.substring(thirdComma + 1);
-    }*/
-    //today_event = dictionary.get("Announcement/Prof/Topic");
+      
+    }
+    // today_event = dictionary.get("Googlecal/Response");
 
     // print the display
     if (updateDisplay) {
@@ -1336,11 +1347,16 @@ void page_GoogleCalendar(void) {
     if (updateDynamicSection) {
       updateDynamicSection = false;
 
-      if (today_event != "") {
-        display.print("");
+      if (dictionary.get("Googlecal/Response") == "") {
+        display.setCursor(24, 32);  // centered to the middle of screen
+        display.print("No data yet");
       } else {
-        display.print("No Events today");
+       
+        display.setCursor(0, 30);
+        display.print( temperature_min);
+        //display.print(receivedPayload);
       }
+    
 
 
       /*

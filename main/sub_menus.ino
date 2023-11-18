@@ -107,7 +107,10 @@ void page_SubMenu1(void) {
         case 2: currPage = SILENTHELPER_SCREEN;return;
         case 3: currPage = HOOTHOOT_START_SCREEN; return;
         case 4: currPage = TELEBOT_SCREEN; return;
-        case 5: currPage = GOOGLE_SCREEN; return;
+        case 5: 
+        client.publish("Googlecal/Request", "True");
+        currPage = GOOGLE_SCREEN; 
+        return;
         case 6: currPage = SMS_SCREEN; return;
       }
     }
