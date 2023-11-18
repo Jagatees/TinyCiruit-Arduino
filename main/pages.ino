@@ -509,8 +509,8 @@ void page_Attendance (void) {
 
     // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      client.publish("Attendance","Jagatees");
-      name = "Jagatees";
+      client.publish("Attendance","Jake");
+      name = "Jake";
       display.setCursor(0, 42);
       display.print("Attendance taken!");
 
@@ -584,7 +584,7 @@ void page_SilentHelper(void) {
       display.print("Press down button");
 
       if (sentResponse) {
-        client.publish("Studenthelp" , "Jagatees");
+        client.publish("Studenthelp" , "Jake");
         display.setCursor(0, 42);
         display.print("Response sent!");
       }
@@ -1037,7 +1037,7 @@ display.print("No data Yet");
       display.print("No data Yet");
     }
     
-    tele_jake = dictionary.get("tele/Jagatees");
+    tele_jake = dictionary.get("tele/Jake");
     
     // print the display
     if (updateDisplay) {
@@ -1106,7 +1106,7 @@ display.print("No data Yet");
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      user_input = secondResponse + "By Jagatees";
+      user_input = secondResponse + "By Jake";
       sentResponse = true;
       client.publish("tele/Request", user_input.c_str());
       updateDynamicSection = true;
@@ -1115,7 +1115,7 @@ display.print("No data Yet");
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      user_input = firstResponse + "By Jagatees";
+      user_input = firstResponse + "By Jake";
       sentResponse = true;
       client.publish("tele/Request", user_input.c_str());
 
@@ -1172,8 +1172,8 @@ void page_SMS(void) {
     }
 
     // HootHoot/Start True
-    if (dictionary.get("tele/Jagatees") != "") {
-      tele_announcement = dictionary.get("tele/Jagatees");
+    if (dictionary.get("tele/Jake") != "") {
+      tele_announcement = dictionary.get("tele/Jake");
 
       if (dictionary.get("tele/SuggestedResponse") != "") { /* Weather condition, Temperature now, Max temperature, Min temperature */
         result = dictionary.get("tele/SuggestedResponse");
@@ -1195,7 +1195,7 @@ void page_SMS(void) {
       display.print("No data Yet");
     }
     
-    tele_jake = dictionary.get("tele/Jagatees");
+    tele_jake = dictionary.get("tele/Jake");
     
     // print the display
     if (updateDisplay) {
@@ -1246,7 +1246,7 @@ void page_SMS(void) {
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      user_input = secondResponse + "By Jagatees";
+      user_input = secondResponse + "By Jake";
       sentResponse = true;
       client.publish("tele/pmRequest", user_input.c_str());
       updateDynamicSection = true;
@@ -1255,7 +1255,7 @@ void page_SMS(void) {
 
         // move the pointer up
     if (btn_Up_WasDown && btnIsUp(BTN_UP)) {
-      user_input = firstResponse + "By Jagatees";
+      user_input = firstResponse + "By Jake";
       sentResponse = true;
       client.publish("tele/pmRequest", user_input.c_str());
 

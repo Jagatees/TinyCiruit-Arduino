@@ -63,7 +63,7 @@ enum pageType {
 };
 
 // holds which page is currently selected
-enum pageType currPage = ROOT_MENU;
+enum pageType currPage = OXIMETER_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -220,17 +220,17 @@ void setup() {
 
   // init the serial port to be used as a display return
   Wire.begin();
-  //Wireling.begin();
+  Wireling.begin();
 
-  // while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
+  while (!SerialMonitorInterface && millis() < 5000); //This will block until the Serial Monitor is opened on TinyScreen+/TinyZero platform!
 
-  // Wireling.selectPort(pulseSensorPort);
-  // if (pulseSensor.begin()) {
-  //   while (true) {
-  //     SerialMonitorInterface.println("MAX30101 Wireling not detected!");
-  //     delay(1000);
-  //   }
-  // }
+  Wireling.selectPort(pulseSensorPort);
+  if (pulseSensor.begin()) {
+    while (true) {
+      SerialMonitorInterface.println("MAX30101 Wireling not detected!");
+      delay(1000);
+    }
+  }
 
   SerialMonitorInterface.begin(20000);
   while (!SerialMonitorInterface) {
@@ -238,12 +238,12 @@ void setup() {
   }
 
   /* Check if SD card is working */
-  //SerialMonitorInterface.println("Initializing SD card...");
+  SerialMonitorInterface.println("Initializing SD card...");
 
-  // if (!SD.begin(10)) {
-  //   SerialMonitorInterface.println("Failed");
-  //   while(true);
-  // }
+  if (!SD.begin(10)) {
+    SerialMonitorInterface.println("Failed");
+    while(true);
+  }
 
   /* RTC */
   rtc.begin();
@@ -807,7 +807,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   String topicStr = String(topic);
   String payloadStr = String(receivedPayload);
-
 
 
   //getPulseAndBuzzer();
