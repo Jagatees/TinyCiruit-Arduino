@@ -291,6 +291,8 @@ void setup() {
 
 void loop() {
 
+
+
  
   // Put both of this in every loop and page section to can check status with MQTT IMPORTANT
   client.loop();
@@ -807,6 +809,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   String topicStr = String(topic);
   String payloadStr = String(receivedPayload);
+
+
 
 
   //getPulseAndBuzzer();

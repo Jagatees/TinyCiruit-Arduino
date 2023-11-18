@@ -1629,6 +1629,9 @@ void game_Over(int score) {
       display.setCursor(24, 24);
       display.print("GAME OVER");
 
+      getPulseAndBuzzer();
+
+
       display.setCursor(24, 34);
       display.print("Score: "); display.print(score);
 
