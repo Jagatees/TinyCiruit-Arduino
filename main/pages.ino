@@ -1351,9 +1351,17 @@ void page_GoogleCalendar(void) {
         display.setCursor(24, 32);  // centered to the middle of screen
         display.print("No data yet");
       } else {
-       
+        display.setCursor(0, 10);
+        display.print(temperature);
+
+        display.setCursor(0, 20);
+        display.print( weather_condition);
+
         display.setCursor(0, 30);
-        display.print( temperature_min);
+        display.print(temperature_min);
+
+        display.setCursor(0, 40);
+        display.print(temperature_max);
         //display.print(receivedPayload);
       }
     
