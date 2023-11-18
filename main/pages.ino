@@ -1500,7 +1500,6 @@ void setBuffer(char i, char amt, unsigned char color){
 void updateDisplay(){
   display.goTo(0,0);
   display.startData();
-  
 
   for(unsigned char y=0;y<groundY;y++){
     
