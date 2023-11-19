@@ -26,7 +26,7 @@ void getAudio(void) {
 // =========================================================================
 // ||                      FUNCTION - RTC TIME                            || 
 // ========================================================================= 
-void displayTime() {    
+/*void displayTime() {    
                   
   for (int i = 1; i < 15; i++) // Display for 15*1000 milliseconds (15 seconds), update display each second
   {
@@ -69,7 +69,7 @@ void displayTime() {
    
     delay(1000); //display for 1 seconds
   }
-}
+}*/
 // =========================================================================
 // ||                          FUNCTION - PULSE AND BUZZER                 || 
 // ========================================================================= 

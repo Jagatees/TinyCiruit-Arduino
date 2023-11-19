@@ -63,7 +63,7 @@ enum pageType {
 };
 
 // holds which page is currently selected
-enum pageType currPage = OXIMETER_SCREEN;
+enum pageType currPage = LOCK_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
@@ -95,14 +95,14 @@ int pulseSensorPort = 2;
 // ||                          VARIABLES - WIFI & MQTT                      ||
 // =========================================================================
 
-const char* ssid = "ZFCROW";
-const char* wifiPassword = "zfcrow1122";
+const char* ssid = "SINGTEL-C8NA";
+const char* wifiPassword = "57hhcumfd8";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.37.192";
+const char* mqttServer = "192.168.1.83";
 const int mqttPort = 1883;
 
 // Create an instance of PubSubClient
@@ -342,56 +342,8 @@ void loop() {
 // =========================================================================
 // ||                          PAGE - LOCK SCREEN                          ||
 // =========================================================================
-void page_LockScreen(void) {
-  static bool isOn = true;
-  // flag for updating the display
-  boolean updateDisplay = true;
-  boolean updateDynamicSection = true;
-
-  // tracks when entered top of loop
-  uint32_t loopStartMs;
-
-  //tracks button states
-  boolean btn_Accept_WasDown = false;
-  boolean btn_Cancel_WasDown = false;
-
-  // selected item pointer
-  uint8_t sub_Pos = 1;
-
-  // inner loop
-  while (true) {
-    loopStartMs = millis();
-
-    // print the display
-    if (updateDisplay) {
-
-      // clear the update flag
-      updateDisplay = false;
-
-      // clear the display
-      clearScreen();
-
-      // start the display
-      display.begin();
-      display.setBrightness(10);  // Set brightness level (0-100)
-
-      // print arrow buttons
-      //printBtnArrows();
-    }
-
-    months = rtc.getMonth();
-    days = rtc.getDay();
-    years = rtc.getYear();
-    hours = rtc.getHours();
-    minutes = rtc.getMinutes();
-    seconds = rtc.getSeconds();
-
-display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font background
-  display.setFont(thinPixel7_10ptFontInfo);
-  //display.on();                           
-
- enum
- {
+// Enum for clock display parameters
+enum {
     clockCenterX = 55,
     clockCenterY = 22,
     clockCircleRadius = 20,
@@ -402,97 +354,131 @@ display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font backgroun
     clockHourHandColor = TS_8b_White,
     clockSecondHandLength = 18,
     clockSecondHandColor = TS_8b_Yellow
-  };
+};
 
-  drawCircle(clockCenterX, clockCenterY, clockCircleRadius, clockCircleColor);
-  
-  for (int i = 1; i < 15; i++) // Display for 15*1000 milliseconds (15 seconds), update display each second
-  {
-
-    display.setFont(liberationSansNarrow_12ptFontInfo);  
-    months = rtc.getMonth();
-    days = rtc.getDay();
-    years = rtc.getYear();
-    hours = rtc.getHours();
-    minutes = rtc.getMinutes();
-    seconds = rtc.getSeconds();
-    int hourAngle;
-    if (hours >= 12)
-      hourAngle = hours - 12;
-    else
-      hourAngle = hours;
-    hourAngle *= 5;
-    hourAngle += minutes / 12;
-    
-    
+void drawClockHands() {
+    int hourAngle = (hours >= 12 ? hours - 12 : hours) * 5 + minutes / 12;
     drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, clockHourHandColor);
     drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, clockMinuteHandColor);
     drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, clockSecondHandColor);
-    
+}
 
-    if (hours <= 12)
-      clock_brightness = hours + 3; // 0 hours = 3 brightness, noon = 15
-    else if (hours >= 18)
-      clock_brightness = (24 - hours) * 2 + 2;  // 23 hours = 4 brightness, 18 hours = 14
-    else
-      clock_brightness = 15; // full brightness all afternoon
-    if (clock_brightness < 3)
-      clock_brightness = 3;
-    if (clock_brightness > 15)
-      clock_brightness = 15;
-    display.setBrightness(clock_brightness);
-    display.setCursor(0,8); //Set the cursor where you want to start printing the date
-    if(months < 10) display.print(0); //print a leading 0 if hour value is less than 0
-    display.print(months);
-    display.print("/");
-    days = rtc.getDay();
-    if (days < 10) display.print(0);
-    display.print(days); 
-    // display.print("/");
-    // display.print(years);
-
-    display.setCursor(0,25); //Set the cursor where you want to start printing the date  
-    setTime(hours,minutes,seconds,days,months,2000 +  years);    //values in the order hr,min,sec,day,month,year
-    char wkday[16];
-    strcpy(wkday, dayStr(weekday()));
-    wkday[3] = ' '; wkday[4] = '\0';
-    display.print(wkday); // To keep the text compact, only print the first 3 letters.
-
-    display.setFont(liberationSansNarrow_12ptFontInfo);   //Set the font type
-
-    // display time in HH:MM:SS 24 hour format
-    display.setCursor(0,45); //Set the cursor where you want to start printing the time
-    if(hours < 10) display.print(0); //print a leading 0 if hour value is less than 0
-    display.print(hours);
-    display.print(":");
-    if(minutes < 10) display.print(0); //print a leading 0 if minute value is less than 0
-    display.print(minutes);
-   
-    delay(1000); //display for 1 seconds
-    
-    // Now erase the clock hands by drawing them in black.
+void eraseClockHands() {
+    int hourAngle = (hours >= 12 ? hours - 12 : hours) * 5 + minutes / 12;
     drawHand(clockCenterX, clockCenterY, hourAngle, clockHourHandLength, TS_8b_Black);
     drawHand(clockCenterX, clockCenterY, minutes, clockMinuteHandLength, TS_8b_Black);
     drawHand(clockCenterX, clockCenterY, seconds, clockSecondHandLength, TS_8b_Black);
+}
 
-    if (hours == alarmHour && minutes == alarmMinute) { //
+void updateDisplayBrightness() {
+    int clock_brightness = (hours <= 12) ? hours + 3 : 
+                           (hours >= 18) ? (24 - hours) * 2 + 2 : 15;
+    clock_brightness = constrain(clock_brightness, 3, 15);
+    display.setBrightness(clock_brightness);
+}
 
+void displayDateTime() {
+    display.setCursor(0, 8);
+    if (months < 10) display.print(0);
+    display.print(months);
+    display.print("/");
+    if (days < 10) display.print(0);
+    display.print(days);
+
+    display.setCursor(0, 25);
+    setTime(hours, minutes, seconds, days, months, 2000 + years);
+    char wkday[16];
+    strncpy(wkday, dayStr(weekday()), 3);
+    wkday[3] = '\0';
+    display.print(wkday);
+}
+
+void displayTime() {
+    display.setCursor(0, 45);
+    if (hours < 10) display.print(0);
+    display.print(hours);
+    display.print(":");
+    if (minutes < 10) display.print(0);
+    display.print(minutes);
+}
+
+void handleAlarm(bool isOn) {
+    if (hours == alarmHour && minutes == alarmMinute) {
         if (isOn) {
-          //display.setBrightness(0);
-          //updateDynamicSection = true;
-          display.off(); // Turn off the display
+            display.off();
         } else {
-          //display.setBrightness(20);
-          display.setCursor(32,45);//display.setCursor(32, 45);
-          display.print("Wake up!!");
-          //updateDynamicSection = true;
-          display.on(); // Turn off the display
+            display.setCursor(32, 45);
+            display.print("Wake up!!");
+            display.on();
+        }
+        isOn = !isOn;
+    }
+}
+
+void page_LockScreen(void) {
+    static bool isOn = true;
+    boolean updateDisplay = true;
+    boolean updateDynamicSection = true;
+    uint32_t loopStartMs;
+    boolean btn_Accept_WasDown = false;
+    boolean btn_Cancel_WasDown = false;
+    uint8_t sub_Pos = 1;
+
+    while (true) {
+        loopStartMs = millis();
+        if (updateDisplay) {
+            updateDisplay = false;
+            clearScreen();
+            display.begin();
+            display.setBrightness(10);
+            //printBtnArrows(); // Uncomment if needed
         }
 
-        isOn = !isOn;
-      }
-  }
+        // Update time from RTC
+        months = rtc.getMonth();
+        days = rtc.getDay();
+        years = rtc.getYear();
+        hours = rtc.getHours();
+        minutes = rtc.getMinutes();
+        seconds = rtc.getSeconds();
 
+        display.fontColor(TS_8b_White, TS_8b_Black);
+        display.setFont(thinPixel7_10ptFontInfo);
+
+        drawCircle(clockCenterX, clockCenterY, clockCircleRadius, clockCircleColor);
+
+        for (int i = 1; i < 15; i++) {
+            display.setFont(liberationSansNarrow_12ptFontInfo);
+            drawClockHands();
+            updateDisplayBrightness();
+            displayDateTime();
+            displayTime();
+            //delay(1000);
+            eraseClockHands();
+            handleAlarm(isOn);
+        }
+
+        // Button handling logic here...
+        // capture button down states
+        if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
+        if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
+
+        // move to the root menu
+        if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
+          display.setBrightness(15);
+          btn_Cancel_WasDown = false;
+        }
+
+        // move to the root menu
+        if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
+          display.setFont(thinPixel7_10ptFontInfo);
+          currPage = ROOT_MENU;
+          return;
+        }
+
+        while (millis() - loopStartMs < 25) { delay(2); }
+    }
+}
     
     /*
     // Print date in US format MM:DD:YY (Switch the order in which day, month, year that you like to use)
@@ -528,27 +514,6 @@ display.fontColor(TS_8b_White,TS_8b_Black); //Set the font color, font backgroun
     display.print(" ");  //just a empty space after the seconds
     //delay(1000); //delay 60 second
     */
-
-
-    // capture button down states
-    if (btnIsDown(BTN_ACCEPT)) { btn_Accept_WasDown = true; }
-    if (btnIsDown(BTN_CANCEL)) { btn_Cancel_WasDown = true; }
-
-    // move to the root menu
-    if (btn_Cancel_WasDown && btnIsUp(BTN_CANCEL)) {
-      display.setBrightness(15);
-      btn_Cancel_WasDown = false;
-    }
-
-    // move to the root menu
-    if (btn_Accept_WasDown && btnIsUp(BTN_ACCEPT)) {
-      currPage = ROOT_MENU;
-      return;
-    }
-    // keep a specific pace
-    while (millis() - loopStartMs < 25) { delay(2); }
-  }
-}
 // =========================================================================
 // ||                          PAGE - ROOT MENU                           ||
 // =========================================================================
