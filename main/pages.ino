@@ -840,7 +840,7 @@ void page_Alarm(void) {
 
     // move the pointer up
     if (btn_Down_WasDown && btnIsUp(BTN_DOWN)) {
-      setMinute = (setMinute + 10) % 60;
+      setMinute = (setMinute + 1) % 60;
       updateDynamicSection = true;
       btn_Down_WasDown = false;
     }

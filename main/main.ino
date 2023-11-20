@@ -63,7 +63,7 @@ enum pageType {
 };
 
 // holds which page is currently selected
-enum pageType currPage = LOCK_SCREEN;
+enum pageType currPage = OXIMETER_SCREEN;
 
 // selected item pointer for the root menu
 uint8_t root_Pos = 1;
