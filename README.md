@@ -1,11 +1,12 @@
-# TinyCiruit-Arduino GUI
+# Tiny Circuit Smart Watch 
 
+EXtranl Lib
+Featuers 
+How to setup it up 
+Team mates 
+Link to demo video 
 
-Libraries to install:
-- Timelib
-- Wire
-- TinyScreen
-- GraphicsBuffer
-- SPI
+Logic of project and sproject stack 
+
 
  
