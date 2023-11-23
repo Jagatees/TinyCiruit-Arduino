@@ -1,23 +1,24 @@
 # Eduwatch+ Smart Watch
 
-# Tech Stack
+## Tech Stack
 
+- [List your technologies here]
 
+## External Libraries
 
+- [List any external libraries used in the project]
 
-EXtranl Lib
-Features 
-How to set it up 
-Teammates 
-Link to the demo video 
-Logic of the project and the project stack 
+## Features
 
+- [List the key features of Eduwatch+ Smart Watch]
 
-[![Video](https://img.youtube.com/vi/N0QGsqv7uY0/0.jpg)](https://www.youtube.com/watch?v=N0QGsqv7uY0)
+## How to Set It Up
 
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
 
-
-## Credits
+## Teammates
 
 <table>
   <tr>
@@ -40,5 +41,12 @@ lilpineapple8</b></sub></a><br />
   </tr>
 </table>
 
+## Link to the Demo Video
 
- 
+[![Demo Video](https://img.youtube.com/vi/YourVideoID/0.jpg)](https://www.youtube.com/watch?v=YourVideoID)
+
+Click on the image above to watch the demo video.
+
+## Logic of the Project and Project Stack
+
+[Explain the logic behind Eduwatch+ Smart Watch and provide details about the project stack.]
