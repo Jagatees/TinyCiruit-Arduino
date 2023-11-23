@@ -10,11 +10,11 @@ Features
 How to set it up 
 Teammates 
 Link to the demo video 
-
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=N0QGsqv7uY0&t=4s&ab_channel=elise" frameborder="0" allowfullscreen></iframe>
-
-
 Logic of the project and the project stack 
+
+
+[![Video](https://img.youtube.com/vi/N0QGsqv7uY0/0.jpg)](https://www.youtube.com/watch?v=N0QGsqv7uY0)
+
 
 
 ## Credits
