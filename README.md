@@ -41,9 +41,9 @@ lilpineapple8</b></sub></a><br />
   </tr>
 </table>
 
-## Link to the Demo Video
+## Link to the Video
 
-[![Demo Video](https://img.youtube.com/vi/YourVideoID/0.jpg)](https://www.youtube.com/watch?v=YourVideoID)
+[![Video](https://img.youtube.com/vi/N0QGsqv7uY0/0.jpg)](https://www.youtube.com/watch?v=N0QGsqv7uY0)
 
 Click on the image above to watch the demo video.
 
