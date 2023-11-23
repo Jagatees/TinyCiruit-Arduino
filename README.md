@@ -1,12 +1,20 @@
-# Tiny Circuit Smart Watch 
+# Eduwatch+ Smart Watch
+
+# Tech Stack
+
+
+
 
 EXtranl Lib
-Featuers 
-How to setup it up 
-Team mates 
-Link to demo video 
+Features 
+How to set it up 
+Teammates 
+Link to the demo video 
 
-Logic of project and sproject stack 
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=N0QGsqv7uY0&t=4s&ab_channel=elise" frameborder="0" allowfullscreen></iframe>
+
+
+Logic of the project and the project stack 
 
 
 ## Credits
