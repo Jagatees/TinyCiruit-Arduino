@@ -13,7 +13,7 @@ Logic of project and sproject stack
 
 <table>
   <tr>
-        <td align="center"><a href="https://github.com/Jagatees"><img src="https://avatars1.githubusercontent.com/u/34540492?s=460&u=6b2d7e8346afc28bfd8e591d93fd548895c720af&v=4" width="100px;" alt=""/><br /><sub><b>Jagatees</b></sub></a><br />
+        <td align="center"><a href="https://github.com/Jagatees"><img src="https://avatars.githubusercontent.com/u/140966272?s=400&u=4366692093a55d4fda2ba7b4a0b5aa221f8ac0b3&v=4" width="100px;" alt=""/><br /><sub><b>Jagatees</b></sub></a><br />
     </td>
     <td align="center"><a href="https://github.com/HiewTeng"><img src="https://avatars.githubusercontent.com/u/94026462?v=4" width="100px;" alt=""/><br /><sub><b>HiewTeng</b></sub></a><br />
     </td>  
