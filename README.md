@@ -21,7 +21,9 @@
 ## Setup Instructions
 
 1. **Set WiFi Credentials:**
-   - Open the initialization (init) file and provide your WiFi username and password.
+   - Open the initialization (main) folder then main.ino and provide your WiFi username and password.
+  
+   ![image](https://github.com/Jagatees/TinyCiruit-Arduino/assets/140966272/78187298-7b78-4d40-ad9f-9b006a827089)
 
 2. **Configure MQTT:**
    - Set up the MQTT (Message Queuing Telemetry Transport) configuration as needed for your project.
