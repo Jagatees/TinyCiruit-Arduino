@@ -4,14 +4,14 @@
 ![Image](https://github.com/Jagatees/TinyCiruit-Arduino/assets/140966272/4008f3af-8a16-4745-9f57-4bb9fb2f399a)
 
 # Project Hardware Components
-**Product Link:** [MicroSD TinyShield](https://tinycircuits.com/products/microsd-tinyshield?_pos=4&_sid=f3b0eaea7&_ss=r)
-**Product Link:** [TinyScreen](https://tinycircuits.com/products/tinyscreen?_pos=12&_sid=8b9ccbfb0&_ss=r)
-**Product Link:** [Buzzer Wireling](https://tinycircuits.com/products/buzzer-wireling?_pos=1&_sid=c48816745&_ss=r)
-**Product Link:** [TinyZero Processor](https://tinycircuits.com/products/tinyzero-processor)
-**Product Link:** [WiFi TinyShield ATWINC1500](https://tinycircuits.com/products/wifi-tinyshield-atwinc1500)
-**Product Link:** [Lithium-ion Polymer Battery (3.7V, 1100mAh)](https://tinycircuits.com/collections/batteries/products/lithium-ion-polymer-battery-3-7v-1100mah)
-**Product Link:** [Audio TinyShield](https://tinycircuits.com/products/audio-tinyshield?_pos=1&_sid=4f2eade8d&_ss=r)
-**Product Link:** [Pulse Oximetry Sensor Wireling](https://tinycircuits.com/products/pulse-oximetry-sensor-wireling?_pos=1&_sid=59983486e&_ss=r)
+[MicroSD TinyShield](https://tinycircuits.com/products/microsd-tinyshield?_pos=4&_sid=f3b0eaea7&_ss=r)
+[TinyScreen](https://tinycircuits.com/products/tinyscreen?_pos=12&_sid=8b9ccbfb0&_ss=r)
+[Buzzer Wireling](https://tinycircuits.com/products/buzzer-wireling?_pos=1&_sid=c48816745&_ss=r)
+[TinyZero Processor](https://tinycircuits.com/products/tinyzero-processor)
+[WiFi TinyShield ATWINC1500](https://tinycircuits.com/products/wifi-tinyshield-atwinc1500)
+[Lithium-ion Polymer Battery (3.7V, 1100mAh)](https://tinycircuits.com/collections/batteries/products/lithium-ion-polymer-battery-3-7v-1100mah)
+[Audio TinyShield](https://tinycircuits.com/products/audio-tinyshield?_pos=1&_sid=4f2eade8d&_ss=r)
+[Pulse Oximetry Sensor Wireling](https://tinycircuits.com/products/pulse-oximetry-sensor-wireling?_pos=1&_sid=59983486e&_ss=r)
 
 
 
