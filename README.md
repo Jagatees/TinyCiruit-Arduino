@@ -18,7 +18,7 @@
 
 - Visit the TinyCircuits website to find and download the required library as a zip file.
 
-## Setup Instructions
+## Setup Tiny Circuits & MQTT
 
 1. **Set WiFi Credentials:**
    - Open the initialization (main) folder then main.ino and provide your WiFi username and password.
@@ -30,6 +30,23 @@
 
 3. **Upload Code to Arduino:**
    - Once configurations are complete, upload the code to your Arduino board.
+  
+## Flask & Telebot
+
+The code for Flask and Telebot can be found in the `FlaskTinyCircuits-main` directory.
+
+### 1. Run Flask Website:
+
+```bash
+python3 application.py
+```
+
+### 1. Run Telebot Listener:
+
+```bash
+python3 telebotcircuit.py
+```
+  
 
 
 ## Teammates
