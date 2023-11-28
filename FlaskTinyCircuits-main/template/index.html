@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+
+{%block title%}Home{%endblock%}
+
+{%block header%}TinyCircuits{%endblock%}
+
+{%block content%}
+    <h2>Home</h2>
+    <p>Welcome to the Flask app for TinyCircuits!</p>
+    
+    <!-- set up a button to send mqtt command -->
+    <form action="/send" method="post">
+        <input type="text" name="message" placeholder="Enter your message here">
+        <input type="submit" value="Send MQTT">
+    </form>
+
+    <!-- set up a button to listen to mqtt command -->
+    <form action="/listen" method="post">
+        <input type="submit" value="Listen to MQTT">
+    </form>
+
+    <!--  a place to print out the message for the listening safe-->
+    <p>{{ message | safe }}</p>
+
+
+    
+{%endblock%}

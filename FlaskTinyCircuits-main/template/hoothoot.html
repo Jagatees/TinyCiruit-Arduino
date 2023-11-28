@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+<!-- this is a kahoot page,have a button in the middle of the screen , on click , toggle a card with the question with 2 options below-->
+{%block title%}HOOT HOOT{%endblock%}
+
+{%block header%}HOOTHOOT TIME{%endblock%}
+
+{%block content%}
+<!-- this is the button to start the kahoot, justify content in the midddle-->
+<div class="container centerContainer">
+        <button class="btn btn-primary displayQuestionButton">Start Quiz</button>
+    </div>
+</div>
+
+<!-- this is the card that will be toggled on click of the button above, the button should disappear and the card will take over, display none at first-->
+<div class="card d-none">
+    <div class="card-body">
+        <h5 class="card-title">Question</h5>
+        <p class="card-text">What is the 3 things computers do?</p>
+        <!-- <a href="#" class="btn btn-primary">Option 1</a>
+        <a href="#" class="btn btn-primary">Option 2</a> -->
+        <!-- INSTEAD OF BUTTONS, show them as progress bar -->
+        <div class="AnsContainer">
+
+            <div class="progress">
+                <div class="progress-bar option1" role="progressbar" style="width: 100%;" aria-valuenow="0" aria-valuemin="0"
+                    aria-valuemax="100">FetchDecodeExecute</div>
+            </div>
+
+            <div class="progress">
+                <div class="progress-bar option2" role="progressbar" style="width: 100%;" aria-valuenow="0" aria-valuemin="0"
+                    aria-valuemax="100">loadandstore</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // button onclick will show 1 card with question and 2 options below
+    // it is like a progress bar that will go up as user selects the answer from their mqtt server 
+    // the progress bar will be a div with a background color that will go up as the user selects the answer
+    
+    // this is the function that will be called on click of the button
+    const showCardButton = document.querySelector('.displayQuestionButton');
+    const centerContainer = document.querySelector('.centerContainer');
+    const card = document.querySelector('.card'); 
+
+
+    showCardButton.addEventListener('click', function(){
+        card.classList.toggle('d-none');
+        centerContainer.classList.toggle('d-none');
+        //sends a request to flask to listen to mqtt server, and also send the options to the mqtt server 
+        data = {
+            'option1': 'A',
+            'option2': 'B',
+            'correctAnswer': 'A'
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/hoothoot',
+            data: JSON.stringify(data),
+            contentType: 'application/json;charset=UTF-8',
+            success: function(response){
+                console.log(response);
+            }
+        });
+
+
+        // after this, every 10s i will send a request to flask to get the data from the mqtt server and update the progress bar
+        // i will use the setInterval function to do this
+        function updateProgressBar(){
+            // specialrequesttag = {
+            //     'stringData': 'special'
+            // }
+            $.ajax({
+                type: 'POST',
+                url: '/hoothoot',
+                //sned a specialrequest string here to tell flask to just send the progress bar data
+                data: JSON.stringify('special'),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(response){
+                  
+
+                    console.log(response);
+                    // update the progress bar
+                    // the response will be a json object with the percentage of the progress bar
+                    // i will use the jquery .css() function to update the width of the progress bar
+                    //calculate the percentage number / sum of both numbers * 100 
+
+                    if (response.option1 == 0 && response.option2 == 0){
+                        response.option1 = 0;
+                        response.option2 = 0;
+                    }
+                    else{
+                        response.option1 = (response.option1 / (response.option1 + response.option2)) * 100;
+                        response.option2 = 100 - response.option1;
+                    }
+                
+                    //put in percentage 
+                    $('.option1').css('width', response.option1 + '%');
+                    $('.option1').text('FetchDecodeExecute' + response.option1 + '%');
+                    $('.option2').css('width', response.option2 + '%');
+                    $('.option2').text('loadandstore' + response.option2 + '%');
+                }
+            });
+        }
+
+        setInterval(updateProgressBar, 3000);
+
+        
+    });
+
+
+</script>
+    
+{%endblock%}

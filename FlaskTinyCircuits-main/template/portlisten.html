@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+<!-- extends layout -->
+
+
+
+{%block title%}Portlistener{%endblock%}
+
+{%block header%}STUDENTS ASSISTANCE DASHBOARD{%endblock%}
+
+{%block content%}
+    <h2>Listener</h2>
+    <p>silent student assistance + portlistener</p>
+
+
+    <!-- the table that will display the table send by the flask server, set classname to data -->
+    <div class="container" >
+        
+        {{ table|safe }}
+ 
+        </div>
+
+ 
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>
+
+
+        //find the table 
+        var table = document.getElementsByClassName('data')[0];
+
+        // add classes to the table
+        table.classList.add('table-hover', 'table-bordered','col-12','text-center');
+        //header center text 
+        var header = table.getElementsByTagName('thead')[0];
+        //the tr in the thead
+        var tr = header.getElementsByTagName('tr')[0];
+        tr.classList.add('text-center');
+
+
+        //find the rows in the table
+        var rows = table.rows;
+        // add the 2nd column to every row, with a bootstrap button in it, the button will change the 
+        //background color of the row to default
+        for (var i = 0; i < rows.length; i++){
+            var row = rows[i];
+            var cells = row.cells;
+            var secondCell = cells[1];
+            var thirdCell = cells[2];  
+            // secondCell.innerHTML = "<button type='button' class='btn btn-primary'>Clear</button>";
+            thirdCell.innerHTML = "<button type='button' class='btn btn-primary'>Clear</button>";
+        }
+
+        //create a button beside the table, when the button is clicked, the attendance will be saved
+        var button = document.createElement('button');
+        button.innerHTML = "Save Attendance";
+        button.classList.add('btn', 'btn-primary');
+        button.addEventListener('click', saveAttendance);
+        //find the div that contains the table
+        var div = document.getElementsByClassName('container')[0];
+        //append the button to the div
+        div.appendChild(button);
+
+
+
+
+        //add an event listener to the button, when the button is clicked, the background color of the row
+        //will be changed to default in bootstrap
+        for (var i = 0; i < rows.length; i++){
+            var row = rows[i];
+            var cells = row.cells;
+            // var secondCell = cells[1];
+            // var button = secondCell.children[0];
+            var thirdCell = cells[2];
+            var button = thirdCell.children[0];
+            //first button clears everything 
+            if (i == 0){
+                button.addEventListener('click', function(){
+                    for (var j = 0; j < rows.length; j++){
+                        var row = rows[j];
+                        // row.style.backgroundColor = "white";
+                        row.classList.remove('table-danger');
+                    }
+                });
+            }else  //other buttons clear only one row
+            {
+                button.addEventListener('click', function(){
+                    var row = this.parentNode.parentNode;
+                    row.classList.remove('table-danger');
+
+                });
+            }
+
+        }
+
+        //a javascript to send a request to flask to retrieve studentsinneed and attendance, 
+        // note that it is a special get request, it is not a normal get request
+        function retrieveStudentsInNeed(){
+
+
+            $.ajax({
+                type: 'POST',
+                url: '/portlisten',
+                data: JSON.stringify('studentsinneed'),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(response){
+                    console.log(response);
+                    //retrieve the studentinneed from the response
+                    studentinneed = response.studentsinneed;
+                    attendance = response.attendance;
+                    console.log(studentinneed);
+                    console.log(attendance);
+                    console.log("length of studenthelp is:")
+                    console.log(studentinneed.length);
+                    console.log("length of attendance is:")
+                    console.log(attendance.length);
+                    //response is a list of students in need
+                    //find the name in the table and increase the request by 1
+                    //the name is in the first column of the table
+                    //the request is in the second column of the table
+
+                    if (studentinneed.length > 0){
+                        console.log("studentinneed length is greater than 0");
+                        for (var i = 0; i < studentinneed.length; i++){
+                            //find the name in the table
+                            var name = studentinneed[i];
+                            console.log("name is "+ name);
+                            for (var j = 0; j < rows.length; j++){
+                                var row = rows[j];
+                                var cells = row.cells;
+                                var firstCell = cells[0];
+                                var secondCell = cells[1];
+                                var nameInTable = firstCell.innerHTML;
+                                console.log("name in table is "+ nameInTable);
+                                console.log("name is "+ name);
+                                //sleep
+                                if (nameInTable == name){
+                                    console.log("found the name in the table");
+
+
+                                    // turn the row red in bootstrap
+
+                                    //row.style.backgroundColor = "red";
+                                    row.classList.add('table-danger');
+                                    //mvoe the row to the top of the table
+                                    row.parentNode.insertBefore(row, row.parentNode.firstChild);
+                                }
+                            }
+                        }
+                    }
+
+                    if(attendance.length > 0){
+                        console.log("attendance length is greater than 0");
+                        for (var i = 0; i < attendance.length; i++){
+                            //find the name in the table
+                            var name = attendance[i];
+                            console.log("name is "+ name);
+                            for (var j = 0; j < rows.length; j++){
+                                var row = rows[j];
+                                var cells = row.cells;
+                                var firstCell = cells[0];
+                                var secondCell = cells[1];
+                                var nameInTable = firstCell.innerHTML;
+                                console.log("name in table is "+ nameInTable);
+                                console.log("name is "+ name);
+                                //sleep
+                                if (nameInTable == name){
+                                    console.log("found the name in the table");
+                                    //modify the 2nd cellinnerhtml  in the row to 1 
+                                    secondCell.innerHTML = 1;
+                                }
+                }
+            }
+        }
+    }
+            });
+        }
+
+        //a function to send a request to flask to save the attendance, into the studenthelper.csv
+        function saveAttendance(){
+            //find the rows in the table
+            var rows = table.rows;
+            //create a list to store the attendance
+            var attendance = [];
+            //skip the first row, because it is the header
+            for (var i = 1; i < rows.length; i++){
+                var row = rows[i];
+                var cells = row.cells;
+                var firstCell = cells[0];
+                var secondCell = cells[1];
+                var name = firstCell.innerHTML;
+                var request = secondCell.innerHTML;
+                //if the request is 1, then the student is present
+                if (request == 1){
+                    attendance.push(name);
+                }
+            }
+            console.log(attendance); 
+            //send the attendance to flask
+            $.ajax({
+                type: 'POST',
+                url: '/portlisten',
+                data: JSON.stringify(attendance),
+                contentType: 'application/json;charset=UTF-8',
+                success: function(response){
+                    //console.log(response);
+                    //response is a csv file
+                    //download the csv file
+                    var csv = response;
+                    var hiddenElement = document.createElement('a');
+                    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                    hiddenElement.target = '_blank';
+                    hiddenElement.download = 'studenthelper.csv';
+                    hiddenElement.click();
+                    
+
+                }
+            });
+        }
+        //a javascript to send a request to flask to retrieve studentsinneed,
+        // note that it is a special get request, it is not a normal get request
+        setInterval(retrieveStudentsInNeed, 3000);
+    </script>
+{%endblock%}
+
