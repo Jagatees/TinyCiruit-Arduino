@@ -4,21 +4,13 @@
 ![Image](https://github.com/Jagatees/TinyCiruit-Arduino/assets/140966272/4008f3af-8a16-4745-9f57-4bb9fb2f399a)
 
 # Project Hardware Components
-1. SD Card Reader
 **Product Link:** [MicroSD TinyShield](https://tinycircuits.com/products/microsd-tinyshield?_pos=4&_sid=f3b0eaea7&_ss=r)
-2. Screen
 **Product Link:** [TinyScreen](https://tinycircuits.com/products/tinyscreen?_pos=12&_sid=8b9ccbfb0&_ss=r)
-3. Buzzer
 **Product Link:** [Buzzer Wireling](https://tinycircuits.com/products/buzzer-wireling?_pos=1&_sid=c48816745&_ss=r)
-4. Processor
 **Product Link:** [TinyZero Processor](https://tinycircuits.com/products/tinyzero-processor)
-5. Wifi
 **Product Link:** [WiFi TinyShield ATWINC1500](https://tinycircuits.com/products/wifi-tinyshield-atwinc1500)
-6. Lithium-ion Battery
 **Product Link:** [Lithium-ion Polymer Battery (3.7V, 1100mAh)](https://tinycircuits.com/collections/batteries/products/lithium-ion-polymer-battery-3-7v-1100mah)
-7. Audio
 **Product Link:** [Audio TinyShield](https://tinycircuits.com/products/audio-tinyshield?_pos=1&_sid=4f2eade8d&_ss=r)
-8. Oximeter
 **Product Link:** [Pulse Oximetry Sensor Wireling](https://tinycircuits.com/products/pulse-oximetry-sensor-wireling?_pos=1&_sid=59983486e&_ss=r)
 
 
