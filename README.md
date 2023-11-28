@@ -2,7 +2,8 @@
 
 ## Tech Stack
 
-- [List your technologies here]
+- Back-End
+![Image of Tech Stack & FlowChart](https://github.com/Jagatees/TinyCiruit-Arduino/assets/140966272/ed7008e1-16cf-47c9-8564-ae3d1da63490)
 
 ## External Libraries
 
