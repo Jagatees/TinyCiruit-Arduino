@@ -95,15 +95,15 @@ int pulseSensorPort = 2;
 // ||                          VARIABLES - WIFI & MQTT                      ||
 // =========================================================================
 
-const char* ssid = "SINGTEL-C8NA";
-const char* wifiPassword = "57hhcumfd8";
+const char* ssid = "INSERT-WIFI-NAME";
+const char* wifiPassword = "INSERT-WIFI-PASSWORD";
 
 // Create an instance of WiFiClient
 WiFiClient espClient;
 
 // MQTT broker details
-const char* mqttServer = "192.168.1.83";
-const int mqttPort = 1883;
+const char* mqttServer = "INSERT-IP-ADDRESS";
+const int mqttPort = 1883; // Default port is 1883; update if changed in MQTT configuration
 
 // Create an instance of PubSubClient
 PubSubClient client;
